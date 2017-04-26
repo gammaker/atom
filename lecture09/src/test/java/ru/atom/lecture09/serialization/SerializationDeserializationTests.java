@@ -26,11 +26,12 @@ public class SerializationDeserializationTests {
 
     @Test
     public void serializableDeserialize() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream("serializable.out");
-        ObjectInputStream oin = new ObjectInputStream(fis);
-        SerializableClass serializable = (SerializableClass) oin.readObject();
-        assertNotNull(serializable);
-        System.out.println(serializable);
+        try (FileInputStream fis = new FileInputStream("serializable.out");
+        ObjectInputStream oin = new ObjectInputStream(fis)) {
+            SerializableClass serializable = (SerializableClass) oin.readObject();
+            assertNotNull(serializable);
+            System.out.println(serializable);
+        }
     }
 
     @Test(expected = NotSerializableException.class)
