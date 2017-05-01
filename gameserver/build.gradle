@@ -1,0 +1,24 @@
+dependencies {
+    testCompile rootProject.libraries.junit
+    compile rootProject.libraries.jackson
+    compile rootProject.libraries.log4j
+    compile rootProject.libraries.jetty_server
+    compile rootProject.libraries.jetty_servlet
+    compile rootProject.libraries.jetbrainsAnnotations
+    compile rootProject.libraries.websocketclient
+    compile rootProject.libraries.websocketserver
+    compile rootProject.libraries.websocketapi
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
