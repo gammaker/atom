@@ -25,7 +25,8 @@ public class Message {
     public static class MoveData {
         public Direction direction;
 
-        @JsonCreator public MoveData(@JsonProperty("direction") Direction direction) {
+        @JsonCreator
+        public MoveData(@JsonProperty("direction") Direction direction) {
             this.direction = direction;
         }
     }
@@ -42,12 +43,13 @@ public class Message {
 
 
     public static class PlantBombData {
-        @JsonCreator public PlantBombData() {
+        @JsonCreator
+        public PlantBombData() {
         }
     }
 
     public Message(PlantBombData data) {
-        this.topic = Topic.MOVE;
+        this.topic = Topic.PLANT_BOMB;
         this.data = JsonHelper.toJson(data);
     }
 
@@ -58,10 +60,15 @@ public class Message {
 
     public static class PossessData {
         public int characterId;
+
+        @JsonCreator
+        public PossessData(@JsonProperty("characterId") int characterId) {
+            this.characterId = characterId;
+        }
     }
 
     public Message(PossessData data) {
-        this.topic = Topic.MOVE;
+        this.topic = Topic.POSSESS;
         this.data = JsonHelper.toJson(data);
     }
 
@@ -70,13 +77,18 @@ public class Message {
         return JsonHelper.fromJson(data, Message.PossessData.class);
     }
 
-
+    //TODO переделать
     public static class ReplicaData {
-        // TODO
+        public Object[] objs;
+
+        @JsonCreator
+        public ReplicaData(@JsonProperty("objs") Object[] objs) {
+            this.objs = objs;
+        }
     }
 
     public Message(ReplicaData data) {
-        this.topic = Topic.MOVE;
+        this.topic = Topic.REPLICA;
         this.data = JsonHelper.toJson(data);
     }
 
