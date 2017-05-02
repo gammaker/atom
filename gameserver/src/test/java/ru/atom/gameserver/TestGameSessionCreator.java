@@ -11,7 +11,8 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public final class TestGameSessionCreator {
 
-    private TestGameSessionCreator() {}
+    private TestGameSessionCreator() {
+    }
 
     static GameSession createGameSession() {
         GameSession gameSession = new GameSession();

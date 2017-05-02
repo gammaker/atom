@@ -14,17 +14,20 @@ public class Character extends GameObject implements Movable {
         super(x, y, session);
     }
 
-    @Override public void tick(long elapsed) {
+    @Override
+    public void tick(long elapsed) {
         move(elapsed);
         timeForNextBomb -= elapsed;
         if (timeForNextBomb < 0) timeForNextBomb = 0;
     }
 
-    @Override public void setMotionDirection(Direction direction) {
+    @Override
+    public void setMotionDirection(Direction direction) {
         this.direction = direction;
     }
 
-    @Override public Direction getMotionDirection() {
+    @Override
+    public Direction getMotionDirection() {
         return direction;
     }
 

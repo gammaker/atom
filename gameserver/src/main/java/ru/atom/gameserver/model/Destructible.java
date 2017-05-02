@@ -6,6 +6,7 @@ package ru.atom.gameserver.model;
 public interface Destructible {
     /**
      * Checks if gameObject is dead. If it becomes dead, executes death actions
+     *
      * @return true if GameObject is dead
      */
     boolean isDead();

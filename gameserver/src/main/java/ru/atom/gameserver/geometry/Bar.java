@@ -9,8 +9,10 @@ public class Bar implements Collider {
     private int width;
     private int height;
 
-    public Bar(int x1, int y1, int x2, int y2) { setFromCorners(x1, y1, x2, y2); }
-    
+    public Bar(int x1, int y1, int x2, int y2) {
+        setFromCorners(x1, y1, x2, y2);
+    }
+
     public Bar setFromCorners(int x1, int y1, int x2, int y2) {
         left = x1;
         bottom = y1;
@@ -18,21 +20,25 @@ public class Bar implements Collider {
         setHeight(y2 - y1);
         return this;
     }
-    
+
     public Bar setLeftX(int x) {
         left = x;
         return this;
     }
-    
-    public int getLeftX() { return left; }
-    
+
+    public int getLeftX() {
+        return left;
+    }
+
     public Bar setBottomY(int y) {
         bottom = y;
         return this;
     }
-    
-    public int getBottomY() { return bottom; }
-    
+
+    public int getBottomY() {
+        return bottom;
+    }
+
     public Bar setWidth(int newWidth) {
         width = newWidth;
         if (width < 0) {
@@ -41,9 +47,11 @@ public class Bar implements Collider {
         }
         return this;
     }
-    
-    public int getWidth() { return width; }
-    
+
+    public int getWidth() {
+        return width;
+    }
+
     public Bar setHeight(int newHeight) {
         height = newHeight;
         if (height < 0) {
@@ -52,11 +60,14 @@ public class Bar implements Collider {
         }
         return this;
     }
-    
-    public int getHeight() { return height; }
-    
 
-    @Override public boolean isColliding(Collider other) {
+    public int getHeight() {
+        return height;
+    }
+
+
+    @Override
+    public boolean isColliding(Collider other) {
         if (other instanceof Point) return isColliding((Point) other);
         if (other instanceof Bar) return isColliding((Bar) other);
         return false;
@@ -75,7 +86,8 @@ public class Bar implements Collider {
                 && bottom <= bar.bottom + bar.height;
     }
 
-    @Override public boolean equals(Object other) {
+    @Override
+    public boolean equals(Object other) {
         if (!(other instanceof Bar)) return false;
         Bar bar = (Bar) other;
         return left == bar.left

@@ -8,14 +8,19 @@ public class Bomb extends GameObject implements Temporary {
         leftLifeTimeMs = lifeTimeMs;
     }
 
-    @Override public void tick(long elapsed) {
+    @Override
+    public void tick(long elapsed) {
         leftLifeTimeMs -= elapsed;
         if (leftLifeTimeMs < 0) leftLifeTimeMs = 0;
     }
 
-    @Override public long getLifetimeMillis() { return leftLifeTimeMs; }
+    @Override
+    public long getLifetimeMillis() {
+        return leftLifeTimeMs;
+    }
 
-    @Override public boolean isDead() {
+    @Override
+    public boolean isDead() {
         if (leftLifeTimeMs == 0 && pos != null) {
             explode();
             pos = null;

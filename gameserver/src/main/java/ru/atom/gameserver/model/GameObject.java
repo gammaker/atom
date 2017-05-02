@@ -16,5 +16,7 @@ public abstract class GameObject {
         this.session = session;
     }
 
-    public Point getPosition() { return pos; }
+    public Point getPosition() {
+        return pos;
+    }
 }

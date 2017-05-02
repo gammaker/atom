@@ -7,7 +7,7 @@ public interface Movable extends Tickable {
     void setMotionDirection(Direction direction);
 
     Direction getMotionDirection();
-    
+
     enum Direction {
         UP, DOWN, RIGHT, LEFT, IDLE
     }
