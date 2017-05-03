@@ -10,7 +10,7 @@ import java.util.List;
 
 public class GameSession {
     private static final Logger log = LogManager.getLogger(GameSession.class);
-
+    
     private int maxId = 0;
 
     public int getUniqueId() {
@@ -35,37 +35,42 @@ public class GameSession {
         return null;
     }
 
-    public Movable getMovable(int id) {
+    public Movable getMovable(int id)
+    {
         GameObject obj = getObject(id);
-        if (obj instanceof Movable) return (Movable) getObject(id);
+        if (obj instanceof Movable) return (Movable)getObject(id);
         return null;
     }
 
-    public Tickable getTickable(int id) {
+    public Tickable getTickable(int id)
+    {
         GameObject obj = getObject(id);
-        if (obj instanceof Tickable) return (Tickable) getObject(id);
+        if (obj instanceof Tickable) return (Tickable)getObject(id);
         return null;
     }
 
-    public Destructible getTemporary(int id) {
+    public Destructible getTemporary(int id)
+    {
         GameObject obj = getObject(id);
-        if (obj instanceof Destructible) return (Destructible) getObject(id);
+        if (obj instanceof Destructible) return (Destructible)getObject(id);
         return null;
     }
 
-    public Character getCharacter(int id) {
+    public Character getCharacter(int id)
+    {
         GameObject obj = getObject(id);
-        if (obj instanceof Character) return (Character) getObject(id);
+        if (obj instanceof Character) return (Character)getObject(id);
         return null;
     }
 
-    public Character getCharacterByPlayerId(int playerId) {
+    public Character getCharacterByPlayerId(int playerId)
+    {
         //Предполагаем, что порядок персонажей в gameObjects
         //совпадает с порядком подключения управляющих ими игроков.
         int charactersToSkip = playerId;
         for (GameObject obj : gameObjects) {
             if (!(obj instanceof Character)) continue;
-            if (charactersToSkip-- == 0) return (Character) obj;
+            if(charactersToSkip-- == 0) return (Character)obj;
         }
         return null;
     }
@@ -80,10 +85,13 @@ public class GameSession {
                 final Message.MoveData md = tickEvents == null ? null :
                         tickEvents.moveActions.get(character.id);
 
-                //TODO: plant bomb
-
                 if (md != null) character.setMotionDirection(md.direction);
                 else character.setMotionDirection(Movable.Direction.IDLE);
+
+                final Message.PlantBombData pbd = tickEvents == null ? null :
+                        tickEvents.plantBombActions.get(character.id);
+
+                if (pbd != null) character.plantBomb();
             }
             if (gameObject instanceof Tickable) {
                 ((Tickable) gameObject).tick(elapsed);
