@@ -57,4 +57,13 @@ public class Character extends GameObject implements Movable {
         session.addGameObject(new Bomb(pos.x, pos.y, 5000, session));
         return true;
     }
+
+    @Override
+    public String toJson() {
+        StringBuilder result = new StringBuilder();
+        result.append("{\"type\":\"Pawn\", \"id\":").append(id)
+                .append(", \"position\":{\"x\":").append(pos.x)
+                .append(", \"y\":").append(pos.y).append("}}");
+        return result.toString();
+    }
 }

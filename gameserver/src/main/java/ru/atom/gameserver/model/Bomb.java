@@ -31,4 +31,13 @@ public class Bomb extends GameObject implements Temporary {
     private void explode() {
 
     }
+
+    @Override
+    public String toJson() {
+        StringBuilder result = new StringBuilder();
+        result.append("{\"type\":\"Bomb\", \"id\":").append(id)
+                .append(", \"position\":{\"x\":").append(pos.x)
+                .append(", \"y\":").append(pos.y).append("}}");
+        return result.toString();
+    }
 }

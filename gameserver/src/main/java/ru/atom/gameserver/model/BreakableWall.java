@@ -16,4 +16,13 @@ public class BreakableWall extends GameObject implements Destructible {
     public boolean isDead() {
         return pos == null;
     }
+
+    @Override
+    public String toJson() {
+        StringBuilder result = new StringBuilder();
+        result.append("{\"type\":\"Wood\", \"id\":").append(id)
+                .append(", \"position\":{\"x\":").append(pos.x)
+                .append(", \"y\":").append(pos.y).append("}}");
+        return result.toString();
+    }
 }

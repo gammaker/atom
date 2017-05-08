@@ -2,21 +2,38 @@ package ru.atom.gameserver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.atom.gameserver.message.Message;
+import ru.atom.gameserver.message.Topic;
 import ru.atom.gameserver.model.GameSession;
 import ru.atom.gameserver.network.Broker;
+import ru.atom.gameserver.network.TickEventContext;
+import ru.atom.gameserver.util.JsonHelper;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-public class Ticker {
-    private static final Logger log = LogManager.getLogger(Ticker.class);
+public class GameSessionTicker extends Thread {
+    private static final Logger log = LogManager.getLogger(GameSessionTicker.class);
     private static final int FPS = 60;
     private static final long FRAME_TIME = 1000 / FPS;
     private long tickNumber = 0;
 
-    private GameSession gameSession;
+    public final GameSession gameSession = new GameSession();
 
-    public void loop() {
+    private TickEventContext eventContext = new TickEventContext();
+
+    public synchronized TickEventContext startNextTick() {
+            final TickEventContext result = eventContext;
+            eventContext = new TickEventContext();
+            return result;
+    }
+
+    public synchronized void addEvent(int objectId, Message message) {
+            eventContext.addEvent(objectId, message);
+    }
+
+    @Override
+    public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             long started = System.currentTimeMillis();
             act(FRAME_TIME);
@@ -33,8 +50,9 @@ public class Ticker {
     }
 
     private void act(long time) {
-        gameSession.tick(time, Broker.getInstance().startNextTick());
-        //TODO: replica
+        final TickEventContext prevTickContext = startNextTick();
+        gameSession.tick(time, prevTickContext);
+        Broker.broadcast(Topic.REPLICA, JsonHelper.toJson(gameSession.getGameObjects()));
     }
 
     public long getTickNumber() {

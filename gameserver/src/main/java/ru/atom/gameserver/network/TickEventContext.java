@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.atom.gameserver.message.Message;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * Accumulates all events that come from clients in one tick.
@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TickEventContext {
     private static final Logger log = LogManager.getLogger(TickEventContext.class);
 
-    public final ConcurrentHashMap<Integer, Message.MoveData> moveActions = new ConcurrentHashMap<>();
-    public final ConcurrentHashMap<Integer, Message.PlantBombData> plantBombActions = new ConcurrentHashMap<>();
+    public final HashMap<Integer, Message.MoveData> moveActions = new HashMap<>();
+    public final HashMap<Integer, Message.PlantBombData> plantBombActions = new HashMap<>();
 
     public void addEvent(int characterId, Message message) {
         try {

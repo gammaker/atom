@@ -11,20 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionPool {
     private static final Logger log = LogManager.getLogger(ConnectionPool.class);
-    private static final ConnectionPool instance = new ConnectionPool();
     private static final int PARALLELISM_LEVEL = 4;
 
-    private final ConcurrentHashMap<Session, String> pool;
-
-    public static ConnectionPool getInstance() {
-        return instance;
-    }
+    private static final ConcurrentHashMap<Session, MatchController.Player> sessionToPlayerInfo = new ConcurrentHashMap<>();
 
     private ConnectionPool() {
-        pool = new ConcurrentHashMap<>();
     }
 
-    public void send(@NotNull Session session, @NotNull String msg) {
+    public static void send(@NotNull Session session, @NotNull String msg) {
         if (session.isOpen()) {
             try {
                 session.getRemote().sendString(msg);
@@ -33,38 +27,41 @@ public class ConnectionPool {
         }
     }
 
-    public void broadcast(@NotNull String msg) {
-        pool.forEachKey(PARALLELISM_LEVEL, session -> send(session, msg));
+    public static void broadcast(@NotNull String msg) {
+        sessionToPlayerInfo.forEachKey(PARALLELISM_LEVEL, session -> send(session, msg));
     }
 
-    public void shutdown() {
-        pool.forEachKey(PARALLELISM_LEVEL, session -> {
+    public static void shutdown() {
+        sessionToPlayerInfo.forEachKey(PARALLELISM_LEVEL, session -> {
             if (session.isOpen()) {
                 session.close();
             }
         });
     }
 
-    public String getPlayer(Session session) {
-        return pool.get(session);
+    public static MatchController.Player getPlayerInfo(Session session) {
+        return sessionToPlayerInfo.get(session);
     }
 
-    public Session getSession(String player) {
-        return pool.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(player))
+    public static Session getSession(String playerName) {
+        return sessionToPlayerInfo.entrySet().stream()
+                .filter(entry -> entry.getValue().name.equals(playerName))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseGet(null);
     }
 
-    public void add(Session session, String player) {
-        if (pool.putIfAbsent(session, player) == null) {
-            log.info("{} joined", player);
-            // TODO: send possess message
+    public static void add(Session session, long playerToken) {
+        MatchController.Player player = MatchController.getPlayerByToken(playerToken);
+        if (player == null) throw new RuntimeException(
+                "Error! Player must be registered by match maker before connection!");
+        if (sessionToPlayerInfo.putIfAbsent(session, player) == null) {
+            log.info("{} joined", player.name);
+            MatchController.onPlayerConnect(session, playerToken);
         }
     }
 
-    public void remove(Session session) {
-        pool.remove(session);
+    public static void remove(Session session) {
+        sessionToPlayerInfo.remove(session);
     }
 }

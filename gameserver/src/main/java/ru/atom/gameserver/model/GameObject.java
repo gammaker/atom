@@ -19,4 +19,6 @@ public abstract class GameObject {
     public Point getPosition() {
         return pos;
     }
+
+    public abstract String toJson();
 }
