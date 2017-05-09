@@ -71,7 +71,6 @@ public class GameSession {
     }
 
     public void tick(long elapsed, TickEventContext tickEvents) {
-        log.info("tick " + elapsed + " ms.");
         ArrayList<GameObject> livingObjects = new ArrayList<>(gameObjects.size());
         for (GameObject gameObject : gameObjects) {
             if (gameObject instanceof Character) {
@@ -82,6 +81,14 @@ public class GameSession {
 
                 if (md != null) character.setMotionDirection(md.direction);
                 else character.setMotionDirection(Movable.Direction.IDLE);
+            }
+            final boolean deleteCurrentObject = gameObject instanceof Destructible
+                    && ((Destructible) gameObject).isDead();
+            if (!deleteCurrentObject) livingObjects.add(gameObject);
+        }
+        for (GameObject gameObject : livingObjects) {
+            if (gameObject instanceof Character) {
+                final Character character = (Character) gameObject;
 
                 final Message.PlantBombData pbd = tickEvents == null ? null :
                         tickEvents.plantBombActions.get(character.id);
@@ -91,9 +98,6 @@ public class GameSession {
             if (gameObject instanceof Tickable) {
                 ((Tickable) gameObject).tick(elapsed);
             }
-            final boolean deleteCurrentObject = gameObject instanceof Destructible
-                    && ((Destructible) gameObject).isDead();
-            if (!deleteCurrentObject) livingObjects.add(gameObject);
         }
         gameObjects = livingObjects;
     }

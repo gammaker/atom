@@ -13,8 +13,8 @@ public class SolidWall extends GameObject {
     public String toJson() {
         StringBuilder result = new StringBuilder();
         result.append("{\"type\":\"Wall\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(pos.x)
-                .append(", \"y\":").append(pos.y).append("}}");
+                .append(", \"position\":{\"x\":").append(getX() / Level.TILE_WIDTH)
+                .append(", \"y\":").append(getY() / Level.TILE_HEIGHT).append("}}");
         return result.toString();
     }
 }

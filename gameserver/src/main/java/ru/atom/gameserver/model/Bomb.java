@@ -36,8 +36,8 @@ public class Bomb extends GameObject implements Temporary {
     public String toJson() {
         StringBuilder result = new StringBuilder();
         result.append("{\"type\":\"Bomb\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(pos.x)
-                .append(", \"y\":").append(pos.y).append("}}");
+                .append(", \"position\":{\"x\":").append(getX())
+                .append(", \"y\":").append(getY()).append("}}");
         return result.toString();
     }
 }

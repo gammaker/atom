@@ -57,43 +57,4 @@ public class Message {
         if (topic != Topic.PLANT_BOMB) return null;
         return JsonHelper.fromJson(data, Message.PlantBombData.class);
     }
-
-    public static class PossessData {
-        public int characterId;
-
-        @JsonCreator
-        public PossessData(@JsonProperty("characterId") int characterId) {
-            this.characterId = characterId;
-        }
-    }
-
-    public Message(PossessData data) {
-        this.topic = Topic.POSSESS;
-        this.data = JsonHelper.toJson(data);
-    }
-
-    public PossessData possessData() {
-        if (topic != Topic.POSSESS) return null;
-        return JsonHelper.fromJson(data, Message.PossessData.class);
-    }
-
-    //TODO переделать
-    public static class ReplicaData {
-        public Object[] objs;
-
-        @JsonCreator
-        public ReplicaData(@JsonProperty("objs") Object[] objs) {
-            this.objs = objs;
-        }
-    }
-
-    public Message(ReplicaData data) {
-        this.topic = Topic.REPLICA;
-        this.data = JsonHelper.toJson(data);
-    }
-
-    public ReplicaData replicaData() {
-        if (topic != Topic.REPLICA) return null;
-        return JsonHelper.fromJson(data, Message.ReplicaData.class);
-    }
 }

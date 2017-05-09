@@ -59,6 +59,10 @@ public class MatchController {
             MatchData data;
             if (matches.containsKey(gameSessionId)) {
                 data = matches.get(gameSessionId);
+                if (data.players.size() >= PLAYERS_PER_GAME) {
+                    log.error("Game session {} is full. Cannot connect new player.", gameSessionId);
+                    return false;
+                }
             } else {
                 data = new MatchData();
                 data.ticker = new GameSessionTicker();
@@ -89,10 +93,11 @@ public class MatchController {
             return;
         }
         player.characterId = character.id;
-        Broker.send(session, Topic.POSSESS, new Message.PossessData(player.characterId));
+        Broker.send(session, Topic.POSSESS, player.characterId);
+        log.info("Player {} connected to his game session!", player.name);
         if (player.match.areAllPlayersConnected()) {
             player.match.ticker.start();
+            log.info("All players connected. Game started!");
         }
-        log.info("Player {} connected to its game session!", player.name);
     }
 }

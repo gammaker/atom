@@ -6,7 +6,7 @@ import ru.atom.gameserver.geometry.Point;
  * Created by gammaker on 05.03.2017.
  */
 public class Character extends GameObject implements Movable {
-    private static final int SPEED = 32;
+    private static final int SPEED = 64;
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
 
@@ -34,7 +34,7 @@ public class Character extends GameObject implements Movable {
     private void move(long elapsed) {
         int xpos = pos.x;
         int ypos = pos.y;
-        final int delta = (int) (SPEED * elapsed / 1000);
+        final int delta = (int) (SPEED * elapsed);
         switch (direction) {
             case UP:
                 ypos += delta;
@@ -55,7 +55,8 @@ public class Character extends GameObject implements Movable {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(pos.x, pos.y, 5000, session));
+        session.addGameObject(new Bomb(getX(), getY(), 5000, session));
+        timeForNextBomb = 5000;
         return true;
     }
 
@@ -63,8 +64,8 @@ public class Character extends GameObject implements Movable {
     public String toJson() {
         StringBuilder result = new StringBuilder();
         result.append("{\"type\":\"Pawn\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(pos.x)
-                .append(", \"y\":").append(pos.y).append("}}");
+                .append(", \"position\":{\"x\":").append(getX())
+                .append(", \"y\":").append(getY()).append("}}");
         return result.toString();
     }
 }

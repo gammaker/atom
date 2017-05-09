@@ -25,7 +25,7 @@ public class ConnectionPool {
                 session.getRemote().sendString(msg);
             } catch (IOException ignored) {
             }
-            log.info("Sent msg {}", msg);
+            //log.info("Sent msg {}", msg);
         }
     }
 
