@@ -6,7 +6,7 @@ import ru.atom.gameserver.geometry.Point;
  * Created by gammaker on 05.03.2017.
  */
 public class Character extends GameObject implements Movable {
-    private static int SPEED = 5;
+    private static final int SPEED = 32;
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
 
@@ -16,7 +16,7 @@ public class Character extends GameObject implements Movable {
 
     @Override
     public void tick(long elapsed) {
-        move(elapsed);
+        if (direction != Direction.IDLE) move(elapsed);
         timeForNextBomb -= elapsed;
         if (timeForNextBomb < 0) timeForNextBomb = 0;
     }
@@ -34,18 +34,19 @@ public class Character extends GameObject implements Movable {
     private void move(long elapsed) {
         int xpos = pos.x;
         int ypos = pos.y;
+        final int delta = (int) (SPEED * elapsed / 1000);
         switch (direction) {
             case UP:
-                ypos += SPEED * elapsed;
+                ypos += delta;
                 break;
             case DOWN:
-                ypos -= SPEED * elapsed;
+                ypos -= delta;
                 break;
             case LEFT:
-                xpos -= SPEED * elapsed;
+                xpos -= delta;
                 break;
             case RIGHT:
-                xpos += SPEED * elapsed;
+                xpos += delta;
                 break;
             default:
         }

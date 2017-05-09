@@ -39,12 +39,12 @@ public class GameSessionTicker extends Thread {
             act(FRAME_TIME);
             long elapsed = System.currentTimeMillis() - started;
             if (elapsed < FRAME_TIME) {
-                log.info("All tick finish at {} ms", elapsed);
+                //log.info("All tick finish at {} ms", elapsed);
                 LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(FRAME_TIME - elapsed));
             } else {
                 log.warn("tick lag {} ms", elapsed - FRAME_TIME);
             }
-            log.info("{}: tick ", tickNumber);
+            //log.info("{}: tick ", tickNumber);
             tickNumber++;
         }
     }
@@ -52,7 +52,8 @@ public class GameSessionTicker extends Thread {
     private void act(long time) {
         final TickEventContext prevTickContext = startNextTick();
         gameSession.tick(time, prevTickContext);
-        Broker.broadcast(Topic.REPLICA, JsonHelper.toJson(gameSession.getGameObjects()));
+        final String replicaJson = "{\"objects\":" + JsonHelper.toJson(gameSession.getGameObjects()) + "}";
+        Broker.broadcast(Topic.REPLICA, replicaJson);
     }
 
     public long getTickNumber() {

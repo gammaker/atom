@@ -36,6 +36,7 @@ ServerProxy = Class.extend({
 
         this.socket.onopen = function() {
             console.log("Connection established.");
+            self.socket.send("Token " + Utils.getParameterByName("token"));
         };
 
         this.socket.onclose = function(event) {

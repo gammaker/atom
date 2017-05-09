@@ -27,7 +27,21 @@
 
 <script>
     function newGame() {
-        window.location = "http://"+window.location.hostname+":8081/mm/join?token=" + Cookies.get('token');
+        var url = "http://"+window.location.hostname+":8081/mm/join?token=" + Cookies.get('token');
+        //window.location = url;
+
+        var settings = {
+            "method": "GET",
+            "crossDomain": true,
+            "url": url
+        };
+
+        $.ajax(settings).done(function(response) {
+            window.location = response;
+        }).fail(function (jqXHR, textStatus) {
+            alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
     }
 </script>
 

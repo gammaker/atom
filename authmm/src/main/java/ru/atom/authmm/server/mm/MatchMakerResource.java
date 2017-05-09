@@ -64,7 +64,7 @@ public class MatchMakerResource {
         }
 
         final String url = GameServerClient.URL + "?token=" + token;
-        return Response.ok(url).build();
+        return Response.ok(url).header("Access-Control-Allow-Origin", "*").build();
     }
 
     @POST

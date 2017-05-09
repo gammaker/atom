@@ -1,9 +1,13 @@
 package ru.atom.gameserver.network;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import ru.atom.gameserver.GameSessionTicker;
 import ru.atom.gameserver.message.Message;
 import ru.atom.gameserver.message.Topic;
+import ru.atom.gameserver.model.Character;
+import ru.atom.gameserver.model.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +16,9 @@ import java.util.HashMap;
  * MatchController manages game sessions on this game server.
  */
 public class MatchController {
+    private static final Logger log = LogManager.getLogger(MatchControllerResource.class);
+    public static final int PLAYERS_PER_GAME = 4;
+
     public static class Player {
         String name;
         long token;
@@ -26,9 +33,10 @@ public class MatchController {
 
     public static class MatchData {
         GameSessionTicker ticker;
-        ArrayList<Player> players = new ArrayList<>(4);
+        ArrayList<Player> players = new ArrayList<>(PLAYERS_PER_GAME);
 
         boolean areAllPlayersConnected() {
+            if (players.size() < PLAYERS_PER_GAME) return false;
             for (Player player : players) {
                 if (!player.isConnected()) return false;
             }
@@ -54,12 +62,14 @@ public class MatchController {
             } else {
                 data = new MatchData();
                 data.ticker = new GameSessionTicker();
+                Level.load("/map.txt", data.ticker.gameSession);
                 matches.put(gameSessionId, data);
             }
-            player.match.ticker = data.ticker;
+            player.match = data;
             data.players.add(player);
             tokenToPlayer.put(token, player);
         }
+        log.info("Added player {} with token {}, {}:{}.", playerName, token, playerId, gameSessionId);
         return true;
     }
 
@@ -69,10 +79,20 @@ public class MatchController {
 
     public static void onPlayerConnect(Session session, long playerToken) {
         final Player player = getPlayerByToken(playerToken);
-        player.characterId = player.match.ticker.gameSession.getCharacterByPlayerId(player.id).id;
+        if (player == null) {
+            log.error("Invalid connect: player with token {} not found!", playerToken);
+            return;
+        }
+        final Character character = player.match.ticker.gameSession.getCharacterByPlayerId(player.id);
+        if (character == null) {
+            log.error("Invalid player id {}.", player.id);
+            return;
+        }
+        player.characterId = character.id;
         Broker.send(session, Topic.POSSESS, new Message.PossessData(player.characterId));
         if (player.match.areAllPlayersConnected()) {
             player.match.ticker.start();
         }
+        log.info("Player {} connected to its game session!", player.name);
     }
 }

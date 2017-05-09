@@ -42,27 +42,27 @@ public class GameModelTest {
                 final Point firstPosition = gameObject.getPosition();
 
                 movable.setMotionDirection(Movable.Direction.UP);
-                movable.tick(1);
+                movable.tick(100);
                 Point currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y > firstPosition.y);
 
                 movable.setMotionDirection(Movable.Direction.DOWN);
-                movable.tick(1);
+                movable.tick(100);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.x == firstPosition.x);
 
                 movable.setMotionDirection(Movable.Direction.RIGHT);
-                movable.tick(1);
+                movable.tick(100);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.x > firstPosition.x);
 
                 movable.setMotionDirection(Movable.Direction.LEFT);
-                movable.tick(1);
+                movable.tick(100);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y == firstPosition.y);
 
                 movable.setMotionDirection(Movable.Direction.IDLE);
-                movable.tick(1);
+                movable.tick(100);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y == firstPosition.y);
             }

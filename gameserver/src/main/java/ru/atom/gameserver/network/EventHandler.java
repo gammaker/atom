@@ -24,6 +24,7 @@ public class EventHandler extends WebSocketAdapter {
         log.info("Received TEXT message: {}", message);
         if (token == null && message.startsWith("Token ")) {
             token = Long.parseLong(message.substring(6));
+            log.info("Got token " + token);
             ConnectionPool.add(session, token);
             return;
         }
