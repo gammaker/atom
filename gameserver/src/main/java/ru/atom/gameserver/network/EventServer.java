@@ -18,6 +18,16 @@ public class EventServer {
         context.setContextPath("/");
         server.setHandler(context);
 
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.packages",
+                "ru.atom.gameserver.network"
+        );
+
+
         // Add a websocket to a specific path spec
         ServletHolder holderEvents = new ServletHolder("ws-events", EventServlet.class);
         context.addServlet(holderEvents, "/events/*");
