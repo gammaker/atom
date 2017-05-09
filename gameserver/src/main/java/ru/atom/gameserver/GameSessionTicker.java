@@ -23,13 +23,13 @@ public class GameSessionTicker extends Thread {
     private TickEventContext eventContext = new TickEventContext();
 
     public synchronized TickEventContext startNextTick() {
-            final TickEventContext result = eventContext;
-            eventContext = new TickEventContext();
-            return result;
+        final TickEventContext result = eventContext;
+        eventContext = new TickEventContext();
+        return result;
     }
 
     public synchronized void addEvent(int objectId, Message message) {
-            eventContext.addEvent(objectId, message);
+        eventContext.addEvent(objectId, message);
     }
 
     @Override

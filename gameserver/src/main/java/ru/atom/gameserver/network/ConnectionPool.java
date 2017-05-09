@@ -13,7 +13,8 @@ public class ConnectionPool {
     private static final Logger log = LogManager.getLogger(ConnectionPool.class);
     private static final int PARALLELISM_LEVEL = 4;
 
-    private static final ConcurrentHashMap<Session, MatchController.Player> sessionToPlayerInfo = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Session, MatchController.Player>
+            sessionToPlayerInfo = new ConcurrentHashMap<>();
 
     private ConnectionPool() {
     }

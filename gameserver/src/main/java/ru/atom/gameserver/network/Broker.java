@@ -18,7 +18,7 @@ public class Broker {
         log.info("RECEIVED: " + msg);
         final Message message = JsonHelper.fromJson(msg, Message.class);
         final MatchController.Player player = ConnectionPool.getPlayerInfo(session);
-        player.gameSessionTicker.addEvent(player.characterId, message);
+        player.match.ticker.addEvent(player.characterId, message);
     }
 
     public static void send(@NotNull Session session, @NotNull Topic topic, @NotNull Object object) {

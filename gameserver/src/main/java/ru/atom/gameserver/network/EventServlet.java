@@ -1,4 +1,4 @@
-package ru.atom.gameserver;
+package ru.atom.gameserver.network;
 
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;

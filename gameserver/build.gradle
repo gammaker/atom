@@ -8,6 +8,8 @@ dependencies {
     compile rootProject.libraries.websocketclient
     compile rootProject.libraries.websocketserver
     compile rootProject.libraries.websocketapi
+    compile rootProject.libraries.jersey_server
+    compile rootProject.libraries.jersey_containers
 }
 
 sourceSets {

@@ -1,10 +1,13 @@
-package ru.atom.gameserver;
+package ru.atom.gameserver.network;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import ru.atom.gameserver.network.ConnectionPool;
 
 public class EventHandler extends WebSocketAdapter {
+    private static final Logger log = LogManager.getLogger(EventHandler.class);
+
     Session session = null;
     Long token = null;
 
@@ -12,24 +15,26 @@ public class EventHandler extends WebSocketAdapter {
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.session = session;
-        System.out.println("Socket Connected: " + session);
+        log.info("Socket Connected: {}", session);
     }
 
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        System.out.println("Received TEXT message: " + message);
+        log.info("Received TEXT message: {}", message);
         if (token == null && message.startsWith("Token ")) {
             token = Long.parseLong(message.substring(6));
-            ConnectionPool.getInstance().add(session, token);
+            ConnectionPool.add(session, token);
             return;
         }
+        Broker.receive(session, message);
     }
 
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
         super.onWebSocketClose(statusCode, reason);
-        System.out.println("Socket Closed: [" + statusCode + "] " + reason);
+        log.info("Socket Closed: [{}] {}", statusCode, reason);
+        if (session.isOpen()) session.close();
     }
 
     @Override

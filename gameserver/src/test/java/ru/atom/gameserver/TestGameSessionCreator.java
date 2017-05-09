@@ -4,7 +4,6 @@ import ru.atom.gameserver.model.Bomb;
 import ru.atom.gameserver.model.BreakableWall;
 import ru.atom.gameserver.model.Character;
 import ru.atom.gameserver.model.GameSession;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Create sample game session with all kinds of objects that will present in bomber-man game

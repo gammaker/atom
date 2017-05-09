@@ -24,7 +24,7 @@ public class GameSession {
     }
 
     public void addGameObject(GameObject gameObject) {
-        log.info(gameObject.getClass().getName() + " " + gameObject.id + " was added to game session.");
+        log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
         gameObjects.add(gameObject);
     }
 
@@ -65,7 +65,7 @@ public class GameSession {
         int charactersToSkip = playerId;
         for (GameObject obj : gameObjects) {
             if (!(obj instanceof Character)) continue;
-            if(charactersToSkip-- == 0) return (Character)obj;
+            if (charactersToSkip-- == 0) return (Character)obj;
         }
         return null;
     }
@@ -91,9 +91,8 @@ public class GameSession {
             if (gameObject instanceof Tickable) {
                 ((Tickable) gameObject).tick(elapsed);
             }
-            final boolean deleteCurrentObject =
-                    gameObject instanceof Destructible &&
-                            ((Destructible) gameObject).isDead();
+            final boolean deleteCurrentObject = gameObject instanceof Destructible
+                    && ((Destructible) gameObject).isDead();
             if (!deleteCurrentObject) livingObjects.add(gameObject);
         }
         gameObjects = livingObjects;

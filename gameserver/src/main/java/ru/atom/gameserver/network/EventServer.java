@@ -1,4 +1,4 @@
-package ru.atom.gameserver;
+package ru.atom.gameserver.network;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
