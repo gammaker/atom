@@ -32,9 +32,13 @@ public class GameSessionTicker extends Thread {
         eventContext.addEvent(objectId, message);
     }
 
+    public synchronized void addDieEvent(int objectId) {
+        eventContext.addDieEvent(objectId);
+    }
+
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!isInterrupted()) {
             long started = System.currentTimeMillis();
             act(FRAME_TIME);
             long elapsed = System.currentTimeMillis() - started;

@@ -81,6 +81,9 @@ public class GameSession {
 
                 if (md != null) character.setMotionDirection(md.direction);
                 else character.setMotionDirection(Movable.Direction.IDLE);
+
+                if (tickEvents.dieActions.contains(character.id))
+                    character.die();
             }
             final boolean deleteCurrentObject = gameObject instanceof Destructible
                     && ((Destructible) gameObject).isDead();

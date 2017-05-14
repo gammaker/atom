@@ -21,11 +21,16 @@ public class EventHandler extends WebSocketAdapter {
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        log.info("Received TEXT message: {}", message);
+        log.info("Received TEXT message: {}.", message);
         if (token == null && message.startsWith("Token ")) {
-            token = Long.parseLong(message.substring(6));
-            log.info("Got token " + token);
-            ConnectionPool.add(session, token);
+            try {
+                token = Long.parseLong(message.substring(6));
+                log.info("Got token {}.", token);
+                ConnectionPool.add(session, token);
+            } catch (NumberFormatException e) {
+                log.error("Invalid token provided: {}.", message.substring(6));
+                session.close();
+            }
             return;
         }
         Broker.receive(session, message);
@@ -35,7 +40,10 @@ public class EventHandler extends WebSocketAdapter {
     public void onWebSocketClose(int statusCode, String reason) {
         super.onWebSocketClose(statusCode, reason);
         log.info("Socket Closed: [{}] {}", statusCode, reason);
-        if (session.isOpen()) session.close();
+        if (session.isOpen()) {
+            session.close();
+        }
+        ConnectionPool.remove(session);
     }
 
     @Override

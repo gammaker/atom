@@ -34,6 +34,7 @@ public class MatchController {
     public static class MatchData {
         GameSessionTicker ticker;
         ArrayList<Player> players = new ArrayList<>(PLAYERS_PER_GAME);
+        int id;
 
         boolean areAllPlayersConnected() {
             if (players.size() < PLAYERS_PER_GAME) return false;
@@ -66,6 +67,7 @@ public class MatchController {
             } else {
                 data = new MatchData();
                 data.ticker = new GameSessionTicker();
+                data.id = gameSessionId;
                 Level.load("/map.txt", data.ticker.gameSession);
                 matches.put(gameSessionId, data);
             }
@@ -87,9 +89,13 @@ public class MatchController {
             log.error("Invalid connect: player with token {} not found!", playerToken);
             return;
         }
+        if (player.isConnected()) {
+            log.warn("Player {} is already connected!", player.name);
+            return;
+        }
         final Character character = player.match.ticker.gameSession.getCharacterByPlayerId(player.id);
         if (character == null) {
-            log.error("Invalid player id {}.", player.id);
+            log.error("Invalid player id {} of player {}.", player.id, player.name);
             return;
         }
         player.characterId = character.id;
@@ -98,6 +104,19 @@ public class MatchController {
         if (player.match.areAllPlayersConnected()) {
             player.match.ticker.start();
             log.info("All players connected. Game started!");
+        }
+    }
+
+    public static void onPlayerDisconnect(Player player) {
+        player.match.players.remove(player);
+        if (player.isConnected()) player.match.ticker.addDieEvent(player.characterId);
+        tokenToPlayer.remove(player.token);
+        if (player.match.players.isEmpty() && player.match.ticker.isAlive()) {
+            player.match.ticker.interrupt();
+            log.info("Interrupting ticker for game session {}.", player.match.id);
+            synchronized (matches) {
+                matches.remove(player.match.id);
+            }
         }
     }
 }

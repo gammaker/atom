@@ -5,7 +5,7 @@ import ru.atom.gameserver.geometry.Point;
 /**
  * Created by gammaker on 05.03.2017.
  */
-public class Character extends GameObject implements Movable {
+public class Character extends GameObject implements Movable, Destructible {
     private static final int SPEED = 64;
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
@@ -67,5 +67,14 @@ public class Character extends GameObject implements Movable {
                 .append(", \"position\":{\"x\":").append(getX())
                 .append(", \"y\":").append(getY()).append("}}");
         return result.toString();
+    }
+
+    public void die() {
+        pos = null;
+    }
+
+    @Override
+    public boolean isDead() {
+        return pos == null;
     }
 }

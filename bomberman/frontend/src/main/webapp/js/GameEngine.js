@@ -39,6 +39,10 @@ GameEngine = Class.extend({
     },
 
     load: function() {
+
+        var canvas = document.getElementById("canvas");
+        canvas.style = "background-image:url(img/tile_grass.png)";
+
         // Init canvas
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
@@ -73,7 +77,7 @@ GameEngine = Class.extend({
         createjs.Sound.addEventListener("fileload", this.onSoundLoaded);
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.registerSound("sound/bomb.ogg", "bomb");
-        // createjs.Sound.registerSound("sound/game.ogg", "game");
+        createjs.Sound.registerSound("sound/game.ogg", "game");
 
         // Create menu
         this.menu = new Menu();
@@ -90,6 +94,7 @@ GameEngine = Class.extend({
 
         // Toggle sound
         gInputEngine.subscribe('mute', this.toggleSound);
+
 
         // Restart listener
         // Timeout because when you press enter in address bar too long, it would not show menu

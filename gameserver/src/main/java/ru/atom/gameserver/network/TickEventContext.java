@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ru.atom.gameserver.message.Message;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Accumulates all events that come from clients in one tick.
@@ -14,6 +15,7 @@ public class TickEventContext {
 
     public final HashMap<Integer, Message.MoveData> moveActions = new HashMap<>();
     public final HashMap<Integer, Message.PlantBombData> plantBombActions = new HashMap<>();
+    public final HashSet<Integer> dieActions = new HashSet<>();
 
     public void addEvent(int characterId, Message message) {
         try {
@@ -32,5 +34,9 @@ public class TickEventContext {
             log.error("Invalid message data for topic {}: {}.", message.topic, message.data);
             e.printStackTrace();
         }
+    }
+
+    public void addDieEvent(int characterId) {
+        dieActions.add(characterId);
     }
 }

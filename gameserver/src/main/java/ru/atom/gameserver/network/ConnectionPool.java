@@ -64,6 +64,9 @@ public class ConnectionPool {
     }
 
     public static void remove(Session session) {
+        final MatchController.Player player = sessionToPlayerInfo.get(session);
+        if (player == null) return;
+        MatchController.onPlayerDisconnect(player);
         sessionToPlayerInfo.remove(session);
     }
 }
