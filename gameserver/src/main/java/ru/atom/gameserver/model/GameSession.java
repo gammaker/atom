@@ -23,6 +23,8 @@ public class GameSession {
         return new ArrayList<>(gameObjects);
     }
 
+    public static char [][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
+
     public void addGameObject(GameObject gameObject) {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
         gameObjects.add(gameObject);

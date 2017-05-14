@@ -20,11 +20,14 @@ public class Level {
             case 'w': return new SolidWall(x, y, game);
             case 'x': return new BreakableWall(x, y, game);
             case 'c': return new Character(x, y, game);
+            case 'b': return new Bonus(x, y, Bonus.Type.BOMB, game);
+            case 'f': return new Bonus(x, y, Bonus.Type.FIRE, game);
+            case 's': return new Bonus(x, y, Bonus.Type.SPEED, game);
             default: return null;
         }
     }
 
-    private static char nextChar(InputStream stream) {
+    public static char nextChar(InputStream stream) {
         char ch = '\n';
         try {
             while (ch == '\n' || ch == '\r') {
@@ -43,6 +46,15 @@ public class Level {
                 final GameObject obj = charToObject(nextChar(stream),
                         x * TILE_WIDTH, (HEIGHT - 1 - y) * TILE_HEIGHT, game);
                 if (obj != null) game.addGameObject(obj);
+            }
+        }
+    }
+
+    public static void loadGameMap(String resourceName, GameSession game) {
+        final InputStream stream = GameServer.class.getResourceAsStream(resourceName);
+        for (int y = 0; y < Level.HEIGHT; y++) {
+            for (int x = 0; x < Level.WIDTH; x++) {
+                game.gameMap[HEIGHT - 1 - y][x] = Level.nextChar(stream);
             }
         }
     }
