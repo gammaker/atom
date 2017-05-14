@@ -74,16 +74,16 @@ public class Bar implements Collider {
     }
 
     boolean isColliding(Point point) {
-        final boolean intersectsX = point.x >= left && point.x <= left + width;
-        final boolean intersectsY = point.y >= bottom && point.y <= bottom + height;
+        final boolean intersectsX = point.x > left && point.x < left + width;
+        final boolean intersectsY = point.y > bottom && point.y < bottom + height;
         return intersectsX && intersectsY;
     }
 
     boolean isColliding(Bar bar) {
-        return left <= bar.left + bar.width
-                && left + width >= bar.left
-                && bottom + height >= bar.bottom
-                && bottom <= bar.bottom + bar.height;
+        return left < bar.left + bar.width
+                && left + width > bar.left
+                && bottom + height > bar.bottom
+                && bottom < bar.bottom + bar.height;
     }
 
     @Override
