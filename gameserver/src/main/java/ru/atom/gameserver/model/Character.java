@@ -64,6 +64,7 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     ypos += delta;
                     break;
+
                 case DOWN:
                     barCharacter = new Bar(getX(), getY() - 1, getX() + WIDTH, getY() - 1 + HEIGHT);
                     //printCharacter(barCharacter);
@@ -82,6 +83,7 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     ypos -= delta;
                     break;
+
                 case LEFT:
                     barCharacter = new Bar(getX() - 1, getY(), getX() - 1 + WIDTH, getY() + HEIGHT);
                     //printCharacter(barCharacter);
@@ -90,7 +92,7 @@ public class Character extends GameObject implements Movable, Destructible {
                         if (GameSession.gameMap[indexY][indexX - 1] != ' ') {
                             Bar barWall = new Bar((indexX - 1) * WIDTH, (indexY) * HEIGHT, (indexX) * WIDTH, (indexY + 1) * HEIGHT);
                             if (barCharacter.isColliding(barWall)) {
-                                //printSomething(barWall, indexX, indexY + 1);
+                                //printSomething(barWall, indexX - 1, indexY);
                                 direction = Direction.IDLE;
                                 flag = true;
                                 break;
@@ -100,6 +102,7 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     xpos -= delta;
                     break;
+
                 case RIGHT:
                     barCharacter = new Bar(getX() + 1, getY(), getX() + 1 + WIDTH, getY() + HEIGHT);
                     //printCharacter(barCharacter);
@@ -118,12 +121,16 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     xpos += delta;
                     break;
+
                 default:
             }
+            GameSession.gameMap[IndexY()][IndexX()] = ' ';
             pos = new Point(xpos, ypos);
+            GameSession.gameMap[IndexY()][IndexX()] = 'c';
             //System.out.println("Point has changed");
         }
         catch (Exception e) {
+            //Maybe ArrayIndexOutOfBoundsException
             System.out.println(e.getMessage());
         }
     }
