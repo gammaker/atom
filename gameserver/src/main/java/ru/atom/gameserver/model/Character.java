@@ -44,124 +44,30 @@ public class Character extends GameObject implements Movable, Destructible {
         int indexX = IndexX();
         boolean flag = false;
         try {
-            Bar barCharacter;
             switch (direction) {
                 case UP:
-/*                    barCharacter = createCharacterBar(0,1);
-                    //barCharacter = new Bar(getX() + 1, getY() + 2, getX() - 1 + WIDTH, getY() + HEIGHT);
-                    printCharacter(barCharacter);
-                    indexX-=2;
-                    for (int i = 0; i <= 2; i++) {
-                        indexX++;
-                        if (session.getGameMapChar(indexY + 1, indexX) != ' ') {
-                            Bar barWall = createWallBar(indexX,indexY,0,1);
-                            //Bar barWall = new Bar((indexX) * WIDTH, (indexY + 1) * HEIGHT, (indexX + 1) * WIDTH, (indexY + 2) * HEIGHT);
-                            if (barCharacter.isColliding(barWall)) {
-                                printSomething(barWall, indexX, indexY + 1);
-                                //direction = Direction.IDLE;
-                                flag = true;
-                                break;
-                            }
-                        }
-                    }*/
-                    flag = collisionFlag(indexX, indexY, 0, 1);
-                    if (flag) {
-                        //System.out.println("Nothing");
-                        break;
-                    }
+                    if (collisionFlag(indexX, indexY, 0, 1)) break;
                     ypos += delta;
-                    //System.out.println("Positon changed");
                     break;
                 case DOWN:
-/*                    barCharacter = createCharacterBar(0,-1);
-                    //barCharacter = new Bar(getX() + 1, getY(), getX() - 1 + WIDTH, getY() - 2 + HEIGHT);
-                    printCharacter(barCharacter);
-                    indexX-=2;
-                    for (int i = 0; i <= 2; i++) {
-                        indexX++;
-                        if (session.getGameMapChar(indexY - 1, indexX) != ' ') {
-                            Bar barWall = createWallBar(indexX,indexY,0,-1);
-                            //Bar barWall = new Bar((indexX) * WIDTH, (indexY - 1) * HEIGHT, (indexX + 1) * WIDTH, (indexY) * HEIGHT);
-                            if (barCharacter.isColliding(barWall)) {
-                                printSomething(barWall, indexX, indexY - 1);
-                                //direction = Direction.IDLE;
-                                flag = true;
-                                break;
-                            }
-                        }
-                    }*/
-                    flag = collisionFlag(indexX, indexY, 0, -1);
-                    if (flag) {
-                        //System.out.println("Nothing");
-                        break;
-                    }
+                    if (collisionFlag(indexX, indexY, 0, -1)) break;
                     ypos -= delta;
-                    //System.out.println("Positon changed");
                     break;
                 case LEFT:
-/*                    barCharacter = createCharacterBar(-1,0);
-                    //barCharacter = new Bar(getX() , getY() + 1, getX() - 2 + WIDTH, getY() - 1 + HEIGHT);
-                    printCharacter(barCharacter);
-                    indexY-=2;
-                    for (int i = 0; i <= 2; i++) {
-                        indexY++;
-                        if (session.getGameMapChar(indexY, indexX - 1) != ' ') {
-                            //Bar barWall = createWallBar(indexX,indexY,-1,0);
-                            Bar barWall = new Bar((indexX - 1) * WIDTH, (indexY) * HEIGHT, (indexX) * WIDTH, (indexY + 1) * HEIGHT);
-                            if (barCharacter.isColliding(barWall)) {
-                                printSomething(barWall, indexX - 1, indexY);
-                                //direction = Direction.IDLE;
-                                flag = true;
-                                break;
-                            }
-                        }
-                    }*/
-                    flag = collisionFlag(indexX, indexY, -1, 0);
-                    if (flag) {
-                        //System.out.println("Nothing");
-                        break;
-                    }
+                    if (collisionFlag(indexX, indexY, -1, 0)) break;
                     xpos -= delta;
-                    //System.out.println("Positon changed");
                     break;
                 case RIGHT:
-/*                    barCharacter = createCharacterBar(1,0);
-                    //barCharacter = new Bar(getX() + 2, getY() + 1, getX() + WIDTH, getY() - 1  + HEIGHT);
-                    printCharacter(barCharacter);
-                    indexY-=2;
-                    for (int i = 0; i <= 2; i++) {
-                        indexY++;
-                        if (session.getGameMapChar(indexY, indexX + 1) != ' ') {
-                            Bar barWall = createWallBar(indexX,indexY,1,0);
-                            //Bar barWall = new Bar((indexX + 1) * WIDTH, (indexY) * HEIGHT, (indexX + 2) * WIDTH, (indexY + 1) * HEIGHT);
-                            if (barCharacter.isColliding(barWall)) {
-                                printSomething(barWall, indexX + 1, indexY);
-                                //direction = Direction.IDLE;
-                                flag = true;
-                                break;
-                            }
-                        }
-                    }*/
-                    flag = collisionFlag(indexX, indexY, 1, 0);
-                    if (flag) {
-                        //System.out.println("Nothing");
-                        break;
-                    }
+                    if (collisionFlag(indexX, indexY, 1, 0)) break;
                     xpos += delta;
-                    //System.out.println("Positon changed");
                     break;
                 default:
             }
             session.onObjectMove(this, new Point(xpos, ypos));
-/*            session.getGameMap()[IndexY()][IndexX()] = ' ';
-            pos = new Point(xpos, ypos);
-            session.getGameMap()[IndexY()][IndexX()] = 'c';*/
-            //System.out.println("Point has changed");
         }
         catch (Exception e) {
             //Maybe ArrayIndexOutOfBoundsException
             System.out.println(e.getMessage());
-            System.out.println("Error");
         }
     }
 
