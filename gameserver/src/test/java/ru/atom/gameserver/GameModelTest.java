@@ -42,27 +42,27 @@ public class GameModelTest {
                 final Point firstPosition = gameObject.getPosition();
 
                 movable.setMotionDirection(Movable.Direction.UP);
-                movable.tick(100);
+                movable.tick(1000);
                 Point currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y > firstPosition.y);
 
                 movable.setMotionDirection(Movable.Direction.DOWN);
-                movable.tick(100);
+                movable.tick(1000);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.x == firstPosition.x);
 
                 movable.setMotionDirection(Movable.Direction.RIGHT);
-                movable.tick(100);
+                movable.tick(1000);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.x > firstPosition.x);
 
                 movable.setMotionDirection(Movable.Direction.LEFT);
-                movable.tick(100);
+                movable.tick(1000);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y == firstPosition.y);
 
                 movable.setMotionDirection(Movable.Direction.IDLE);
-                movable.tick(100);
+                movable.tick(1000);
                 currentPosition = gameObject.getPosition();
                 Assert.assertTrue(currentPosition.y == firstPosition.y);
             }
@@ -94,6 +94,7 @@ public class GameModelTest {
         Assert.assertTrue(temporariesAfterSmallTime.containsAll(temporaries));
 
         gameSession.tick(maxLifeTime + 1, null);
+        gameSession.tick(1000, null);
         temporaries = gameSession.getGameObjects().stream()
                 .filter(o -> o instanceof Temporary)
                 .map(o -> (Temporary) o).collect(Collectors.toList());

@@ -67,7 +67,6 @@ public class MatchController {
                 data.ticker = new GameSessionTicker();
                 data.id = gameSessionId;
                 Level.load("/map.txt", data.ticker.gameSession);
-                Level.loadGameMap("/map.txt", data.ticker.gameSession);
                 matches.put(gameSessionId, data);
             }
             player.match = data;

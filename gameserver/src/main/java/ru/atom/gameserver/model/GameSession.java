@@ -27,11 +27,8 @@ public class GameSession {
 
     private char[][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
 
-    public void initializeGameMap(char[][] gameMap) {
-        this.gameMap = gameMap;
-    }
-
     public char getGameMapChar(int y, int x) {
+        if (y < 0 || y >= Level.HEIGHT || x < 0 || x >= Level.WIDTH) return ' ';
         return gameMap[y][x];
     }
 
@@ -66,6 +63,8 @@ public class GameSession {
     public void addGameObject(GameObject gameObject) {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
         newGameObjects.add(gameObject);
+        if (gameObject instanceof Fire) return;
+        gameMap[gameObject.IndexY()][gameObject.IndexX()] = gameObject.getCharCode();
     }
 
     public GameObject getObject(int id) {

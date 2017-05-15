@@ -30,8 +30,43 @@ public class Bomb extends GameObject implements Temporary {
         return pos == null;
     }
 
+    private void killObjectsInTile(int tileX, int tileY) {
+        for (GameObject obj : session.getGameObjects()) {
+            if (!(obj instanceof Destructible)) continue;
+            if (((Destructible) obj).isDead()) continue;
+            if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
+            if (obj instanceof BreakableWall) ((BreakableWall) obj).destroy();
+            else if (obj instanceof Character) ((Character) obj).die();
+        }
+    }
+
+    private void placeFire(int tileX, int tileY) {
+        final char ch = session.getGameMapChar(tileY, tileX);
+        if (ch == 'c' || ch == 'x') killObjectsInTile(tileX, tileY);
+        session.addGameObject(new Fire(tileX * Level.TILE_WIDTH,
+                tileY * Level.TILE_HEIGHT, 1000, session));
+    }
+
     private void explode() {
-        //TODO создать огни, расходящиеся в 4 стороны на strength клеток
+        final int tileX = IndexX();
+        final int tileY = IndexY();
+        placeFire(tileX, tileY);
+        for (int x = tileX - 1; x >= tileX - strength; x--) {
+            if (session.getGameMapChar(tileY, x) == 'w') break;
+            placeFire(x, tileY);
+        }
+        for (int x = tileX + 1; x <= tileX + strength; x++) {
+            if (session.getGameMapChar(tileY, x) == 'w') break;
+            placeFire(x, tileY);
+        }
+        for (int y = tileY - 1; y >= tileY - strength; y--) {
+            if (session.getGameMapChar(y, tileX) == 'w') break;
+            placeFire(tileX, y);
+        }
+        for (int y = tileY + 1; y <= tileY + strength; y++) {
+            if (session.getGameMapChar(y, tileX) == 'w') break;
+            placeFire(tileX, y);
+        }
     }
 
     @Override

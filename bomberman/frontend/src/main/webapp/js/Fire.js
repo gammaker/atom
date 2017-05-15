@@ -48,7 +48,7 @@ Fire = Entity.extend({
         gGameEngine.stage.removeChild(this.bmp);
         for (var i = 0; i < gGameEngine.fires.length; i++) {
             var fire = gGameEngine.fires[i];
-            if (this == player) {
+            if (this == fire) {
                 gGameEngine.fires.splice(i, 1);
             }
         }

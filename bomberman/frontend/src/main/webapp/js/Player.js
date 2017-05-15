@@ -36,7 +36,8 @@ Player = Entity.extend({
     init: function(id, position) {
         this.id = id;
 
-        var img = gGameEngine.playerGirlImg;
+        var allImages = [gGameEngine.playerBoyImg, gGameEngine.playerGirlImg, gGameEngine.playerGirl2Img];
+        var img = allImages[Player.totalPlayersCreated++ % 3];
 
         var spriteSheet = new createjs.SpriteSheet({
             images: [img],
@@ -128,3 +129,5 @@ Player = Entity.extend({
         }
     }
 });
+
+Player.totalPlayersCreated = 0;

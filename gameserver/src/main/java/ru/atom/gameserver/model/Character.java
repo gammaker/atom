@@ -11,9 +11,17 @@ public class Character extends GameObject implements Movable, Destructible {
     private static final int HEIGHT = Level.TILE_HEIGHT;
     private static final int WIDTH = Level.TILE_WIDTH;
 
-    private static final int SPEED = 128;
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
+
+    private static int INITIAL_SPEED = 128;
+    private static int INITIAL_BOMB_DELAY = 2500;
+    private static int INITIAL_BOMB_STRENGTH = 1;
+    private static int BONUS_BOMB_STRENGTH = 5;
+
+    private int speed = INITIAL_SPEED;
+    private long bombDelay = INITIAL_BOMB_DELAY;
+    private int bombStrength = INITIAL_BOMB_STRENGTH;
 
     public Character(int x, int y, GameSession session) {
         super(x, y, session);
@@ -39,7 +47,7 @@ public class Character extends GameObject implements Movable, Destructible {
     private void move(long elapsed) {
         int xpos = pos.x;
         int ypos = pos.y;
-        final int delta = (int) (SPEED * elapsed);
+        final int delta = (int) (speed * elapsed);
         int indexY = IndexY();
         int indexX = IndexX();
         try {
@@ -74,9 +82,9 @@ public class Character extends GameObject implements Movable, Destructible {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(IndexX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 2,
-                IndexY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 2, 2500, 1, session));
-        timeForNextBomb = 2500;
+        session.addGameObject(new Bomb(IndexX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 4,
+                IndexY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 4, 2500, bombStrength, session));
+        timeForNextBomb = bombDelay;
         return true;
     }
 
@@ -91,14 +99,41 @@ public class Character extends GameObject implements Movable, Destructible {
         for (int i = 0; i <= 2; i++) {
             if(flag) indexX++;
             else indexY++;
-            if (session.getGameMapChar(indexY + y, indexX + x) != ' ') {
+            final char mapChar = session.getGameMapChar(indexY + y, indexX + x);
+            if (mapChar == 'w' || mapChar == 'x' || mapChar == 'b') {
                 Bar barWall = createWallBar(indexX, indexY, x, y);
                 if (barCharacter.isColliding(barWall)) {
+                    if (mapChar == 'b') {
+                        pickBonus(indexX, indexY);
+                        continue;
+                    }
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private void pickBonus(int tileX, int tileY) {
+        for (GameObject obj : session.getGameObjects()) {
+            if (!(obj instanceof Bonus)) continue;
+            if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
+            final Bonus bonus = (Bonus) obj;
+            switch (bonus.type) {
+                case SPEED:
+                    speed = INITIAL_SPEED * 2;
+                    break;
+
+                case BOMB:
+                    bombDelay = INITIAL_BOMB_DELAY / 2;
+                    break;
+
+                case FIRE:
+                    bombStrength = BONUS_BOMB_STRENGTH;
+                    break;
+            }
+            bonus.destroy();
+        }
     }
 
     private Bar createCharacterBar(int x, int y, int delta) {
@@ -122,6 +157,7 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     public void die() {
+        session.onObjectDestroy(this);
         pos = null;
     }
 

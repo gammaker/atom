@@ -55,15 +55,4 @@ public class Level {
         // Characters must be added to scene after all other objects to be on top of all objects.
         for (GameObject ch : characters) game.addGameObject(ch);
     }
-
-    public static void loadGameMap(String resourceName, GameSession game) {
-        final InputStream stream = GameServer.class.getResourceAsStream(resourceName);
-        char [][] map = new char[Level.HEIGHT][Level.WIDTH];
-        for (int y = 0; y < Level.HEIGHT; y++) {
-            for (int x = 0; x < Level.WIDTH; x++) {
-                map[HEIGHT - 1 - y][x] = Level.nextChar(stream);
-            }
-        }
-        game.initializeGameMap(map);
-    }
 }

@@ -9,6 +9,11 @@ public class BreakableWall extends GameObject implements Destructible {
     }
 
     public void destroy() {
+        final Bonus.Type type = Bonus.genRandomTypeOrNull();
+        Bonus bonus = null;
+        if (type != null) bonus = new Bonus(getX(), getY(), type, session);
+        session.onObjectDestroy(this);
+        if (bonus != null) session.addGameObject(bonus);
         pos = null;
     }
 
