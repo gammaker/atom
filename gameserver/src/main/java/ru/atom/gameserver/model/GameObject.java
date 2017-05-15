@@ -37,4 +37,14 @@ public abstract class GameObject {
     }
 
     public abstract void addToReplica(StringBuilder sb);
+
+    public int IndexX() {
+        return (getX()+Level.TILE_WIDTH/2)/Level.TILE_WIDTH;
+    }
+
+    public int IndexY() {
+        return (getY()+Level.TILE_HEIGHT/2)/Level.TILE_HEIGHT;
+    }
+
+    public abstract char getCharCode();
 }

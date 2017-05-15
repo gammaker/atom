@@ -23,7 +23,7 @@ public class Broker {
     }
 
     public static void broadcast(@NotNull String msg) {
-        //log.info("BROADCASTING: {}", msg);
+        log.info("BROADCASTING: {}", msg);
         ConnectionPool.broadcast(msg);
     }
 

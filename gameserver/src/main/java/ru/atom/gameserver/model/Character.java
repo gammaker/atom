@@ -8,8 +8,8 @@ import ru.atom.gameserver.geometry.Point;
  */
 public class Character extends GameObject implements Movable, Destructible {
 
-    private final static int HEIGHT = Level.TILE_HEIGHT;
-    private final static int WIDTH = Level.TILE_WIDTH;
+    private static final int HEIGHT = Level.TILE_HEIGHT;
+    private static final int WIDTH = Level.TILE_WIDTH;
 
     private static final int SPEED = 64;
     private Direction direction = Direction.IDLE;
@@ -47,11 +47,12 @@ public class Character extends GameObject implements Movable, Destructible {
             Bar barCharacter;
             switch (direction) {
                 case UP:
-                    barCharacter = new Bar(getX() + 1, getY() + 2, getX() - 2 + WIDTH, getY() - 1 + HEIGHT);
+                    barCharacter = new Bar(getX(), getY() + 1, getX() + WIDTH, getY() + 1 + HEIGHT);
                     //printCharacter(barCharacter);
-                    for (int i = -1; i <= 1; i++) {
-                        indexX+=i;
-                        if (GameSession.gameMap[indexY + 1][indexX] != ' ') {
+                    indexX--;
+                    for (int i = 0; i <= 2; i++) {
+                        indexX++;
+                        if (session.getGameMap()[indexY + 1][indexX] != ' ') {
                             Bar barWall = new Bar((indexX) * WIDTH, (indexY + 1) * HEIGHT, (indexX + 1) * WIDTH, (indexY + 2) * HEIGHT);
                             if (barCharacter.isColliding(barWall)) {
                                 //printSomething(barWall, indexX, indexY + 1);
@@ -65,11 +66,12 @@ public class Character extends GameObject implements Movable, Destructible {
                     ypos += delta;
                     break;
                 case DOWN:
-                    barCharacter = new Bar(getX() + 1, getY(), getX() - 2 + WIDTH, getY() - 3 + HEIGHT);
+                    barCharacter = new Bar(getX(), getY() - 1, getX() + WIDTH, getY() - 1 + HEIGHT);
                     //printCharacter(barCharacter);
-                    for (int i = -1; i <= 1; i++) {
-                        indexX+=i;
-                        if (GameSession.gameMap[indexY - 1][indexX] != ' ') {
+                    indexX--;
+                    for (int i = 0; i <= 2; i++) {
+                        indexX++;
+                        if (session.getGameMap()[indexY - 1][indexX] != ' ') {
                             Bar barWall = new Bar((indexX) * WIDTH, (indexY - 1) * HEIGHT, (indexX + 1) * WIDTH, (indexY) * HEIGHT);
                             if (barCharacter.isColliding(barWall)) {
                                 //printSomething(barWall, indexX, indexY - 1);
@@ -83,11 +85,12 @@ public class Character extends GameObject implements Movable, Destructible {
                     ypos -= delta;
                     break;
                 case LEFT:
-                    barCharacter = new Bar(getX(), getY() + 1, getX() - 3 + WIDTH, getY() - 2 + HEIGHT);
+                    barCharacter = new Bar(getX() - 1, getY(), getX() - 1 + WIDTH, getY() + HEIGHT);
                     //printCharacter(barCharacter);
-                    for (int i = -1; i <= 1; i++) {
-                        indexY += i;
-                        if (GameSession.gameMap[indexY][indexX - 1] != ' ') {
+                    indexY--;
+                    for (int i = 0; i <= 2; i++) {
+                        indexY++;
+                        if (session.getGameMap()[indexY][indexX - 1] != ' ') {
                             Bar barWall = new Bar((indexX - 1) * WIDTH, (indexY) * HEIGHT, (indexX) * WIDTH, (indexY + 1) * HEIGHT);
                             if (barCharacter.isColliding(barWall)) {
                                 //printSomething(barWall, indexX - 1, indexY);
@@ -101,11 +104,12 @@ public class Character extends GameObject implements Movable, Destructible {
                     xpos -= delta;
                     break;
                 case RIGHT:
-                    barCharacter = new Bar(getX() + 2, getY() + 1, getX() - 1 + WIDTH, getY() - 2 + HEIGHT);
+                    barCharacter = new Bar(getX() + 1, getY(), getX() + 1 + WIDTH, getY() + HEIGHT);
                     //printCharacter(barCharacter);
-                    for (int i = -1; i <= 1; i++) {
-                        indexY += i;
-                        if (GameSession.gameMap[indexY][indexX + 1] != ' ') {
+                    indexY--;
+                    for (int i = 0; i <= 2; i++) {
+                        indexY++;
+                        if (session.getGameMap()[indexY][indexX + 1] != ' ') {
                             Bar barWall = new Bar((indexX + 1) * WIDTH, (indexY) * HEIGHT, (indexX + 2) * WIDTH, (indexY + 1) * HEIGHT);
                             if (barCharacter.isColliding(barWall)) {
                                 //printSomething(barWall, indexX + 1, indexY);
@@ -120,9 +124,10 @@ public class Character extends GameObject implements Movable, Destructible {
                     break;
                 default:
             }
-            GameSession.gameMap[IndexY()][IndexX()] = ' ';
+            session.onObjectMove(this, new Point(xpos, ypos));
+            /*session.getGameMap()[IndexY()][IndexX()] = ' ';
             pos = new Point(xpos, ypos);
-            GameSession.gameMap[IndexY()][IndexX()] = 'c';
+            session.getGameMap()[IndexY()][IndexX()] = 'c';*/
             //System.out.println("Point has changed");
         }
         catch (Exception e) {
@@ -133,20 +138,16 @@ public class Character extends GameObject implements Movable, Destructible {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(getX(), getY(), 5000, session));
+        session.addGameObject(new Bomb(getX(), getY(), 5000, 1, session));
         timeForNextBomb = 5000;
         return true;
     }
 
-    public int IndexX() {
-        return (getX()+Level.TILE_HEIGHT/2)/Level.TILE_WIDTH;
+    private Bar createBar(int x, int y) {
+        return new Bar(getX() + 1 + x, getY() + 1 + x, getX() - 2 + x + WIDTH, getY() - 2 + y + HEIGHT);
     }
 
-    public int IndexY() {
-        return (getY()+Level.TILE_HEIGHT/2)/Level.TILE_HEIGHT;
-    }
-
-    public void printCharacter(Bar barCharacter) {
+    private void printCharacter(Bar barCharacter) {
         int lX = barCharacter.getLeftX();
         int bY = barCharacter.getBottomY();
         int rX = barCharacter.getLeftX() + barCharacter.getWidth();
@@ -155,7 +156,7 @@ public class Character extends GameObject implements Movable, Destructible {
         System.out.println("barCharacter:"+lX+" "+bY+" "+rX+" "+tY);
     }
 
-    public void printSomething(Bar barWall, int indexX, int indexY) {
+    private void printSomething(Bar barWall, int indexX, int indexY) {
         int lX1 = barWall.getLeftX();
         int bY1 = barWall.getBottomY();
         int rX1 = barWall.getLeftX() + barWall.getWidth();
@@ -166,7 +167,7 @@ public class Character extends GameObject implements Movable, Destructible {
 
     @Override
     public void addToReplica(StringBuilder sb) {
-        sb.append("C(").append(id)
+        sb.append("c(").append(id)
                 .append(",").append(getX())
                 .append(",").append(getY())
                 .append(")\n");
@@ -179,5 +180,10 @@ public class Character extends GameObject implements Movable, Destructible {
     @Override
     public boolean isDead() {
         return pos == null;
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'c';
     }
 }

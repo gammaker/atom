@@ -2,12 +2,12 @@ Messages = Class.extend({
     handler: {},
 
     init: function () {
-        this.handler['C'] = this.handlePawn;
+        this.handler['c'] = this.handlePawn;
         this.handler['B'] = this.handleBomb;
         this.handler['b'] = this.handleBonus;
-        this.handler['X'] = this.handleWood;
-        this.handler['W'] = this.handleWall;
-        this.handler['F'] = this.handleFire;
+        this.handler['x'] = this.handleWood;
+        this.handler['w'] = this.handleWall;
+        this.handler['f'] = this.handleFire;
         this.handler['M'] = this.handleMove;
         this.handler['D'] = this.handleDestroy;
     },
@@ -21,15 +21,15 @@ Messages = Class.extend({
             if (!event.trim()) continue;
 
             //split event in format type(params)
-            var bracketPos = event.data.indexOf('(');
-            var type = event.data.substr(0, bracketPos);
+            var bracketPos = event.indexOf('(');
+            var type = event.substr(0, bracketPos);
 
             if (gMessages.handler[type] === undefined) {
                 console.log('Unknown event type ' + type + '. Event: ' + event);
                 continue;
             }
 
-            var params = event.data.substr(bracketPos + 1, event.data.length - bracketPos - 2);
+            var params = event.substr(bracketPos + 1, event.length - bracketPos - 2);
             gMessages.handler[type](params.split(','));
         }
     },
@@ -38,33 +38,9 @@ Messages = Class.extend({
         gInputEngine.possessed = parseInt(msg);
     },
 
-    findAnyObject: function (id) {
-        var obj = gGameEngine.players.find(function (el) {
-            return el.id === id;
-        });
-        if (obj) return obj;
-        obj = gGameEngine.bombs.find(function (el) {
-            return el.id === id;
-        });
-        if (obj) return obj;
-        obj = gGameEngine.bonuses.find(function (el) {
-            return el.id === id;
-        });
-        if (obj) return obj;
-        obj = gGameEngine.fires.find(function (el) {
-            return el.id === id;
-        });
-        if (obj) return obj;
-        obj = gGameEngine.tiles.find(function (el) {
-            return el.id === id;
-        });
-        if (obj) return obj;
-        return null;
-    },
-
     handleMove: function (params) {
         var id = parseInt(params[0]);
-        var obj = this.findAnyObject(id);
+        var obj = GameEngine.findAnyObject(id);
         if (!obj) return;
         var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
         obj.bmp.x = position.x;
@@ -90,7 +66,7 @@ Messages = Class.extend({
             player.bmp.x = position.x;
             player.bmp.y = position.y;
         } else {
-            console.log(new Date().getTime() + " handel new player " + obj.id);
+            console.log(new Date().getTime() + " created new player " + id);
             player = new Player(id, position);
             gGameEngine.players.push(player);
         }

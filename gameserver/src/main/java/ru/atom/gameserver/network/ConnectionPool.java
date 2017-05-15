@@ -44,14 +44,6 @@ public class ConnectionPool {
         return sessionToPlayerInfo.get(session);
     }
 
-    public static Session getSession(String playerName) {
-        return sessionToPlayerInfo.entrySet().stream()
-                .filter(entry -> entry.getValue().name.equals(playerName))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElseGet(null);
-    }
-
     public static void add(Session session, long playerToken) {
         MatchController.Player player = MatchController.getPlayerByToken(playerToken);
         if (player == null) throw new RuntimeException(

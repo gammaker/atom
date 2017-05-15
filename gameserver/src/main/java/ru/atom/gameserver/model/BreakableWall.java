@@ -19,9 +19,14 @@ public class BreakableWall extends GameObject implements Destructible {
 
     @Override
     public void addToReplica(StringBuilder sb) {
-        sb.append("X(").append(id)
+        sb.append("x(").append(id)
                 .append(",").append(getX())
                 .append(",").append(getY())
                 .append(")\n");
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'x';
     }
 }

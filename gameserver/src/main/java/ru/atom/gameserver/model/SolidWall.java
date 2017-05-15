@@ -11,9 +11,14 @@ public class SolidWall extends GameObject {
 
     @Override
     public void addToReplica(StringBuilder sb) {
-        sb.append("W(").append(id)
+        sb.append("w(").append(id)
                 .append(",").append(getX())
                 .append(",").append(getY())
                 .append(")\n");
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'w';
     }
 }

@@ -33,4 +33,9 @@ public class Bonus extends GameObject implements Destructible {
                 .append(",").append(type.ordinal())
                 .append(")\n");
     }
+
+    @Override
+    public char getCharCode() {
+        return 'b';
+    }
 }

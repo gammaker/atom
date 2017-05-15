@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import ru.atom.gameserver.model.GameSession;
 import ru.atom.gameserver.network.Broker;
 import ru.atom.gameserver.network.TickEventContext;
-import ru.atom.gameserver.util.JsonHelper;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -53,9 +52,9 @@ public class GameSessionTicker extends Thread {
 
     private void act(long time) {
         final TickEventContext prevTickContext = startNextTick();
-        gameSession.tick(time, prevTickContext);
-        final String replicaJson = "{\"objects\":" + JsonHelper.toJson(gameSession.getGameObjects()) + "}";
-        Broker.broadcast("{\"topic\":\"REPLICA\",\"data\":" + replicaJson + "}");
+        final String replica = gameSession.tick(time, prevTickContext).toString();
+        if (replica.isEmpty()) return; //Nothing changed, no need to send replica.
+        Broker.broadcast("Replica(\n" + replica + ")");
     }
 
     public long getTickNumber() {
