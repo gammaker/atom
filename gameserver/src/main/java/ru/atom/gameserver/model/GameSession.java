@@ -2,7 +2,6 @@ package ru.atom.gameserver.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.atom.gameserver.message.Message;
 import ru.atom.gameserver.network.TickEventContext;
 
 import java.util.ArrayList;
@@ -18,46 +17,26 @@ public class GameSession {
     }
 
     private List<GameObject> gameObjects = new ArrayList<>();
+    private List<GameObject> newGameObjects = new ArrayList<>();
 
     public List<GameObject> getGameObjects() {
         return new ArrayList<>(gameObjects);
     }
 
-    public static char [][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
+    public static char[][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
 
     public void addGameObject(GameObject gameObject) {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
-        gameObjects.add(gameObject);
+        newGameObjects.add(gameObject);
     }
 
     public GameObject getObject(int id) {
         for (GameObject obj : gameObjects) {
             if (obj.id == id) return obj;
         }
-        return null;
-    }
-
-    public Movable getMovable(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Movable) return (Movable)getObject(id);
-        return null;
-    }
-
-    public Tickable getTickable(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Tickable) return (Tickable)getObject(id);
-        return null;
-    }
-
-    public Destructible getTemporary(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Destructible) return (Destructible)getObject(id);
-        return null;
-    }
-
-    public Character getCharacter(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Character) return (Character)getObject(id);
+        for (GameObject obj : newGameObjects) {
+            if (obj.id == id) return obj;
+        }
         return null;
     }
 
@@ -69,41 +48,50 @@ public class GameSession {
             if (!(obj instanceof Character)) continue;
             if (charactersToSkip-- == 0) return (Character)obj;
         }
+        for (GameObject obj : newGameObjects) {
+            if (!(obj instanceof Character)) continue;
+            if (charactersToSkip-- == 0) return (Character)obj;
+        }
         return null;
     }
 
-    public void tick(long elapsed, TickEventContext tickEvents) {
+
+    public StringBuilder tick(long elapsed, TickEventContext tickEvents) {
         ArrayList<GameObject> livingObjects = new ArrayList<>(gameObjects.size());
+        StringBuilder replica = new StringBuilder();
         for (GameObject gameObject : gameObjects) {
             if (gameObject instanceof Character) {
                 final Character character = (Character) gameObject;
 
-                final Message.MoveData md = tickEvents == null ? null :
-                        tickEvents.moveActions.get(character.id);
+                Movable.Direction direction = null;
+                if (tickEvents != null) direction = tickEvents.moveActions.get(character.id);
+                if (direction == null) direction = Movable.Direction.IDLE;
+                character.setMotionDirection(direction);
 
-                if (md != null) character.setMotionDirection(md.direction);
-                else character.setMotionDirection(Movable.Direction.IDLE);
+                if (tickEvents.plantBombActions.contains(character.id)) {
+                    character.plantBomb();
+                }
 
-                if (tickEvents.dieActions.contains(character.id))
+                if (tickEvents.dieActions.contains(character.id)) {
                     character.die();
+                }
             }
             final boolean deleteCurrentObject = gameObject instanceof Destructible
                     && ((Destructible) gameObject).isDead();
-            if (!deleteCurrentObject) livingObjects.add(gameObject);
-        }
-        for (GameObject gameObject : livingObjects) {
-            if (gameObject instanceof Character) {
-                final Character character = (Character) gameObject;
 
-                final Message.PlantBombData pbd = tickEvents == null ? null :
-                        tickEvents.plantBombActions.get(character.id);
-
-                if (pbd != null) character.plantBomb();
-            }
             if (gameObject instanceof Tickable) {
                 ((Tickable) gameObject).tick(elapsed);
             }
+
+            if (!deleteCurrentObject) livingObjects.add(gameObject);
+            else replica.append("D(").append(gameObject.id).append(")\n");
         }
+        for (GameObject gameObject : newGameObjects) {
+            livingObjects.add(gameObject);
+            gameObject.addToReplica(replica);
+        }
+        newGameObjects.clear();
         gameObjects = livingObjects;
+        return replica;
     }
 }

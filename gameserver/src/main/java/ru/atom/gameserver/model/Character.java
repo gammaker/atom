@@ -165,12 +165,11 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     @Override
-    public String toJson() {
-        StringBuilder result = new StringBuilder();
-        result.append("{\"type\":\"Pawn\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(getX())
-                .append(", \"y\":").append(getY()).append("}}");
-        return result.toString();
+    public void addToReplica(StringBuilder sb) {
+        sb.append("C(").append(id)
+                .append(",").append(getX())
+                .append(",").append(getY())
+                .append(")\n");
     }
 
     public void die() {

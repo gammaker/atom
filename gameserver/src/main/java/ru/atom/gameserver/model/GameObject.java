@@ -22,6 +22,10 @@ public abstract class GameObject {
         return pos;
     }
 
+    public Point getPosition() {
+        return new Point(pos.x/1000, pos.y/1000);
+    }
+
     // x coordinate in pixels
     public int getX() {
         return (pos.x + 500) / 1000;
@@ -32,5 +36,5 @@ public abstract class GameObject {
         return (pos.y + 500) / 1000;
     }
 
-    public abstract String toJson();
+    public abstract void addToReplica(StringBuilder sb);
 }

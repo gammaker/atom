@@ -4,6 +4,7 @@ import ru.atom.gameserver.network.GameServer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * Created by gammaker on 09.05.2017.
@@ -41,13 +42,18 @@ public class Level {
 
     public static void load(String resourceName, GameSession game) {
         final InputStream stream = GameServer.class.getResourceAsStream(resourceName);
+        ArrayList<GameObject> characters = new ArrayList<>(4);
         for (int y = 0; y < HEIGHT; y++) {
             for (int x = 0; x < WIDTH; x++) {
                 final GameObject obj = charToObject(nextChar(stream),
                         x * TILE_WIDTH, (HEIGHT - 1 - y) * TILE_HEIGHT, game);
-                if (obj != null) game.addGameObject(obj);
+                if (obj == null) continue;
+                if (obj instanceof Character) characters.add(obj);
+                else game.addGameObject(obj);
             }
         }
+        // Characters must be added to scene after all other objects to be on top of all objects.
+        for (GameObject ch : characters) game.addGameObject(ch);
     }
 
     public static void loadGameMap(String resourceName, GameSession game) {

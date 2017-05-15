@@ -2,106 +2,172 @@ Messages = Class.extend({
     handler: {},
 
     init: function () {
-        this.handler['Pawn'] = this.handlePawn;
-        this.handler['Bomb'] = this.handleBomb;
-        this.handler['Wood'] = this.handleTile;
-        this.handler['Wall'] = this.handleTile;
-        this.handler['Fire'] = this.handleFire;
+        this.handler['C'] = this.handlePawn;
+        this.handler['B'] = this.handleBomb;
+        this.handler['b'] = this.handleBonus;
+        this.handler['X'] = this.handleWood;
+        this.handler['W'] = this.handleWall;
+        this.handler['F'] = this.handleFire;
+        this.handler['M'] = this.handleMove;
+        this.handler['D'] = this.handleDestroy;
     },
-
-    move: function (direction) {
-        var template = {
-            topic: "MOVE",
-            data: {}
-        };
-
-        template.data.direction = direction.toUpperCase();
-        return JSON.stringify(template);
-    },
-
-    plantBomb: function () {
-        var template = {
-            topic: "PLANT_BOMB",
-            data: {}
-        };
-
-        return JSON.stringify(template);
-    },
-
 
     handleReplica: function (msg) {
-        var gameObjects = JSON.parse(msg.data).objects;
-        var survivors = new Set();
+        var events = msg.split('\n');
 
-        for (var i = 0; i < gameObjects.length; i++) {
-            var obj = gameObjects[i];
-            if (gMessages.handler[obj.type] === undefined)
+        for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+
+            if (!event.trim()) continue;
+
+            //split event in format type(params)
+            var bracketPos = event.data.indexOf('(');
+            var type = event.data.substr(0, bracketPos);
+
+            if (gMessages.handler[type] === undefined) {
+                console.log('Unknown event type ' + type + '. Event: ' + event);
                 continue;
+            }
 
-            survivors.add(obj.id);
-            gMessages.handler[obj.type](obj);
+            var params = event.data.substr(bracketPos + 1, event.data.length - bracketPos - 2);
+            gMessages.handler[type](params.split(','));
         }
-        gGameEngine.gc(survivors);
     },
 
     handlePossess: function (msg) {
-        gInputEngine.possessed = parseInt(msg.data);
+        gInputEngine.possessed = parseInt(msg);
     },
 
-    handlePawn: function(obj) {
-        var player = gGameEngine.players.find(function (el) {
-            return el.id === obj.id;
+    findAnyObject: function (id) {
+        var obj = gGameEngine.players.find(function (el) {
+            return el.id === id;
         });
-        var position = Utils.getEntityPosition(obj.position);
+        if (obj) return obj;
+        obj = gGameEngine.bombs.find(function (el) {
+            return el.id === id;
+        });
+        if (obj) return obj;
+        obj = gGameEngine.bonuses.find(function (el) {
+            return el.id === id;
+        });
+        if (obj) return obj;
+        obj = gGameEngine.fires.find(function (el) {
+            return el.id === id;
+        });
+        if (obj) return obj;
+        obj = gGameEngine.tiles.find(function (el) {
+            return el.id === id;
+        });
+        if (obj) return obj;
+        return null;
+    },
+
+    handleMove: function (params) {
+        var id = parseInt(params[0]);
+        var obj = this.findAnyObject(id);
+        if (!obj) return;
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
+        obj.bmp.x = position.x;
+        obj.bmp.y = position.y;
+    },
+
+    handleDestroy: function (params) {
+        var id = parseInt(params[0]);
+        var obj = this.findAnyObject(id);
+        if (!obj) return;
+        if (obj.die !== undefined) obj.die();
+        obj.remove();
+    },
+
+    handlePawn: function(params) {
+        var id = parseInt(params[0]);
+        var player = gGameEngine.players.find(function (el) {
+            return el.id === id;
+        });
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
 
         if (player) {
             player.bmp.x = position.x;
             player.bmp.y = position.y;
         } else {
             console.log(new Date().getTime() + " handel new player " + obj.id);
-            player = new Player(obj.id, position);
+            player = new Player(id, position);
             gGameEngine.players.push(player);
         }
     },
 
-    handleBomb: function(obj) {
+    handleBomb: function(params) {
+        var id = parseInt(params[0]);
         var bomb = gGameEngine.bombs.find(function (el) {
-            return el.id === obj.id;
+            return el.id === id;
         });
-        var position = Utils.getEntityPosition(obj.position);
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
 
         if (bomb) {
             bomb.bmp.x = position.x;
             bomb.bmp.y = position.y;
         } else {
-            bomb = new Bomb(obj.id, position);
+            bomb = new Bomb(id, position);
             gGameEngine.bombs.push(bomb);
         }
     },
 
-    handleTile: function (obj) {
+    handleWood: function (params) {
+        var id = parseInt(params[0]);
         var tile = gGameEngine.tiles.find(function (el) {
-            return el.id === obj.id;
+            return el.id === id;
         });
 
-        var position = Utils.getEntityPosition(Utils.convertToBitmapPosition(obj.position));
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
         if (tile) {
-            tile.material = obj.type;
+            tile.material = 'Wood';
         } else {
-            tile = new Tile(obj.id, obj.type, position);
+            tile = new Tile(id, 'Wood', position);
             gGameEngine.tiles.push(tile);
         }
     },
 
-    handleFire: function (obj) {
-        var fire = gGameEngine.fires.find(function (el) {
-            return el.id === obj.id;
+    handleWall: function (params) {
+        var id = parseInt(params[0]);
+        var tile = gGameEngine.tiles.find(function (el) {
+            return el.id === id;
         });
 
-        var position = Utils.getEntityPosition(obj.position);
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
+        if (tile) {
+            tile.material = 'Wall';
+        } else {
+            tile = new Tile(id, 'Wall', position);
+            gGameEngine.tiles.push(tile);
+        }
+    },
+
+    handleFire: function (params) {
+        var id = parseInt(params[0]);
+        var fire = gGameEngine.fires.find(function (el) {
+            return el.id === id;
+        });
+
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
         if (!fire) {
-            fire = new Fire(obj.id, position);
+            fire = new Fire(id, position);
             gGameEngine.fires.push(fire);
+        }
+    },
+
+    handleBonus: function (params) {
+        var id = parseInt(params[0]);
+        var bonus = gGameEngine.bonuses.find(function (el) {
+            return el.id === id;
+        });
+        var position = Utils.getEntityPosition({x: parseInt(params[1]), y: parseInt(params[2])});
+
+        if (bonus) {
+            bonus.bmp.x = position.x;
+            bonus.bmp.y = position.y;
+        } else {
+            bonus = new Bonus(id, position, parseInt(params[3]));
+            gGameEngine.bonuses.push(bonus);
         }
     }
 

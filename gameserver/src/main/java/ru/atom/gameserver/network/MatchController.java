@@ -4,8 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import ru.atom.gameserver.GameSessionTicker;
-import ru.atom.gameserver.message.Message;
-import ru.atom.gameserver.message.Topic;
 import ru.atom.gameserver.model.Character;
 import ru.atom.gameserver.model.Level;
 
@@ -100,7 +98,7 @@ public class MatchController {
             return;
         }
         player.characterId = character.id;
-        Broker.send(session, Topic.POSSESS, player.characterId);
+        Broker.send(session, "Possess(" + player.characterId + ")");
         log.info("Player {} connected to his game session!", player.name);
         if (player.match.areAllPlayersConnected()) {
             player.match.ticker.start();

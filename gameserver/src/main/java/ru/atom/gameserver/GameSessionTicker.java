@@ -2,8 +2,6 @@ package ru.atom.gameserver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.atom.gameserver.message.Message;
-import ru.atom.gameserver.message.Topic;
 import ru.atom.gameserver.model.GameSession;
 import ru.atom.gameserver.network.Broker;
 import ru.atom.gameserver.network.TickEventContext;
@@ -28,8 +26,8 @@ public class GameSessionTicker extends Thread {
         return result;
     }
 
-    public synchronized void addEvent(int objectId, Message message) {
-        eventContext.addEvent(objectId, message);
+    public synchronized void addEvent(int objectId, String msg) {
+        eventContext.addEvent(objectId, msg);
     }
 
     public synchronized void addDieEvent(int objectId) {
@@ -57,7 +55,7 @@ public class GameSessionTicker extends Thread {
         final TickEventContext prevTickContext = startNextTick();
         gameSession.tick(time, prevTickContext);
         final String replicaJson = "{\"objects\":" + JsonHelper.toJson(gameSession.getGameObjects()) + "}";
-        Broker.broadcast(Topic.REPLICA, replicaJson);
+        Broker.broadcast("{\"topic\":\"REPLICA\",\"data\":" + replicaJson + "}");
     }
 
     public long getTickNumber() {

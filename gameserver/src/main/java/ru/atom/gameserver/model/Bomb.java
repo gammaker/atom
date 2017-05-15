@@ -33,11 +33,10 @@ public class Bomb extends GameObject implements Temporary {
     }
 
     @Override
-    public String toJson() {
-        StringBuilder result = new StringBuilder();
-        result.append("{\"type\":\"Bomb\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(getX())
-                .append(", \"y\":").append(getY()).append("}}");
-        return result.toString();
+    public void addToReplica(StringBuilder sb) {
+        sb.append("B(").append(id)
+                .append(",").append(getX())
+                .append(",").append(getY())
+                .append(")\n");
     }
 }
