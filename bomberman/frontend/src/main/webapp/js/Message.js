@@ -49,7 +49,7 @@ Messages = Class.extend({
 
     handleDestroy: function (params) {
         var id = parseInt(params[0]);
-        var obj = this.findAnyObject(id);
+        var obj = GameEngine.findAnyObject(id);
         if (!obj) return;
         if (obj.die !== undefined) obj.die();
         obj.remove();

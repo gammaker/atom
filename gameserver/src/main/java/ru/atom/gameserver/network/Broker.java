@@ -12,7 +12,6 @@ public class Broker {
     }
 
     public static void receive(@NotNull Session session, @NotNull String msg) {
-        log.info("RECEIVED: {}", msg);
         final MatchController.Player player = ConnectionPool.getPlayerInfo(session);
         player.match.ticker.addEvent(player.characterId, msg);
     }

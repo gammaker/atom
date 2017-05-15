@@ -11,7 +11,7 @@ public class Character extends GameObject implements Movable, Destructible {
     private static final int HEIGHT = Level.TILE_HEIGHT;
     private static final int WIDTH = Level.TILE_WIDTH;
 
-    private static final int SPEED = 64;
+    private static final int SPEED = 128;
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
 
@@ -42,28 +42,29 @@ public class Character extends GameObject implements Movable, Destructible {
         final int delta = (int) (SPEED * elapsed);
         int indexY = IndexY();
         int indexX = IndexX();
-        boolean flag = false;
         try {
             switch (direction) {
                 case UP:
-                    if (collisionFlag(indexX, indexY, 0, 1)) break;
+                    if (collisionFlag(indexX, indexY, 0, 1, delta)) break;
                     ypos += delta;
                     break;
                 case DOWN:
-                    if (collisionFlag(indexX, indexY, 0, -1)) break;
+                    if (collisionFlag(indexX, indexY, 0, -1, delta)) break;
                     ypos -= delta;
                     break;
                 case LEFT:
-                    if (collisionFlag(indexX, indexY, -1, 0)) break;
+                    if (collisionFlag(indexX, indexY, -1, 0, delta)) break;
                     xpos -= delta;
                     break;
                 case RIGHT:
-                    if (collisionFlag(indexX, indexY, 1, 0)) break;
+                    if (collisionFlag(indexX, indexY, 1, 0, delta)) break;
                     xpos += delta;
                     break;
                 default:
             }
-            session.onObjectMove(this, new Point(xpos, ypos));
+            final Point newPos = new Point(xpos, ypos);
+            session.onObjectMove(this, newPos);
+            pos = newPos;
         }
         catch (Exception e) {
             //Maybe ArrayIndexOutOfBoundsException
@@ -73,32 +74,26 @@ public class Character extends GameObject implements Movable, Destructible {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(getX(), getY(), 5000, 1, session));
-        timeForNextBomb = 5000;
+        session.addGameObject(new Bomb(IndexX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 2,
+                IndexY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 2, 2500, 1, session));
+        timeForNextBomb = 2500;
         return true;
     }
 
-    private boolean collisionFlag(int indexX, int indexY, int x, int y) {
+    private boolean collisionFlag(int indexX, int indexY, int x, int y, int delta) {
         boolean flag = false;
-        Bar barCharacter = createCharacterBar(x,y);
-        //barCharacter = new Bar(getX() + 1, getY() + 2, getX() - 1 + WIDTH, getY() + HEIGHT);
-        //printCharacter(barCharacter);
-        if(x==0) {
-            indexX-=2;
+        Bar barCharacter = createCharacterBar(x, y, delta);
+        if(x == 0) {
+            indexX -= 2;
             flag = true;
         }
-        else if(y==0) indexY-=2;
+        else if(y == 0) indexY -= 2;
         for (int i = 0; i <= 2; i++) {
-            if(flag)
-                indexX++;
-            else
-                indexY++;
+            if(flag) indexX++;
+            else indexY++;
             if (session.getGameMapChar(indexY + y, indexX + x) != ' ') {
-                Bar barWall = createWallBar(indexX,indexY,x,y);
-                //Bar barWall = new Bar((indexX) * WIDTH, (indexY + 1) * HEIGHT, (indexX + 1) * WIDTH, (indexY + 2) * HEIGHT);
+                Bar barWall = createWallBar(indexX, indexY, x, y);
                 if (barCharacter.isColliding(barWall)) {
-                    //printSomething(barWall, indexX, indexY + 1);
-                    //direction = Direction.IDLE;
                     return true;
                 }
             }
@@ -106,31 +101,16 @@ public class Character extends GameObject implements Movable, Destructible {
         return false;
     }
 
-    private Bar createCharacterBar(int x, int y) {
-        return new Bar(getX() + 1 + x, getY() + 1 + y, getX() - 1 + x + WIDTH, getY() - 1 + y + HEIGHT);
+    private Bar createCharacterBar(int x, int y, int delta) {
+        return new Bar((pos.x + delta + 500) / 1000 + x,
+                (pos.y + delta + 500) / 1000 + y,
+                (pos.x - delta + 500) / 1000 + x + WIDTH,
+                (pos.y -delta + 500) / 1000 + y + HEIGHT);
     }
 
     private Bar createWallBar(int indexX, int indexY, int x, int y) {
         return new Bar((indexX + x) * WIDTH, (indexY + y) * HEIGHT,
                 (indexX + x + 1) * WIDTH, (indexY + y + 1) * HEIGHT);
-    }
-
-    private void printCharacter(Bar barCharacter) {
-        int lX = barCharacter.getLeftX();
-        int bY = barCharacter.getBottomY();
-        int rX = barCharacter.getLeftX() + barCharacter.getWidth();
-        int tY = barCharacter.getBottomY() + barCharacter.getHeight();
-        System.out.println("Player: ["+IndexY()+"]["+IndexX()+"]=y:"+getY()+" x:"+getX());
-        System.out.println("barCharacter:"+lX+" "+bY+" "+rX+" "+tY);
-    }
-
-    private void printSomething(Bar barWall, int indexX, int indexY) {
-        int lX1 = barWall.getLeftX();
-        int bY1 = barWall.getBottomY();
-        int rX1 = barWall.getLeftX() + barWall.getWidth();
-        int tY1 = barWall.getBottomY() + barWall.getHeight();
-        System.out.println("Colliding bar[" + indexY + "][" + indexX + "]:" +
-                lX1 + " " + bY1 + " " + rX1 + " " + tY1);
     }
 
     @Override
