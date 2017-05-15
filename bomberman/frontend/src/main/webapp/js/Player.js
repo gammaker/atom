@@ -117,5 +117,14 @@ Player = Entity.extend({
             }
 
         }, 30);
+    },
+
+    remove: function() {
+        for (var i = 0; i < gGameEngine.players.length; i++) {
+            var player = gGameEngine.players[i];
+            if (this == player) {
+                gGameEngine.players.splice(i, 1);
+            }
+        }
     }
 });

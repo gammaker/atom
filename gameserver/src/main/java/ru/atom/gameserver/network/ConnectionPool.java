@@ -25,7 +25,6 @@ public class ConnectionPool {
                 session.getRemote().sendString(msg);
             } catch (IOException ignored) {
             }
-            //log.info("Sent msg {}", msg);
         }
     }
 
@@ -43,14 +42,6 @@ public class ConnectionPool {
 
     public static MatchController.Player getPlayerInfo(Session session) {
         return sessionToPlayerInfo.get(session);
-    }
-
-    public static Session getSession(String playerName) {
-        return sessionToPlayerInfo.entrySet().stream()
-                .filter(entry -> entry.getValue().name.equals(playerName))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElseGet(null);
     }
 
     public static void add(Session session, long playerToken) {

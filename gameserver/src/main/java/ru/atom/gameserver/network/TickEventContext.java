@@ -2,7 +2,7 @@ package ru.atom.gameserver.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.atom.gameserver.message.Message;
+import ru.atom.gameserver.model.Movable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,26 +13,34 @@ import java.util.HashSet;
 public class TickEventContext {
     private static final Logger log = LogManager.getLogger(TickEventContext.class);
 
-    public final HashMap<Integer, Message.MoveData> moveActions = new HashMap<>();
-    public final HashMap<Integer, Message.PlantBombData> plantBombActions = new HashMap<>();
+    public final HashMap<Integer, Movable.Direction> moveActions = new HashMap<>();
+    public final HashSet<Integer> plantBombActions = new HashSet<>();
     public final HashSet<Integer> dieActions = new HashSet<>();
 
-    public void addEvent(int characterId, Message message) {
-        try {
-            switch (message.topic) {
-                case MOVE:
-                    moveActions.put(characterId, message.moveData());
-                    return;
+    public void addEvent(int characterId, String msg) {
+        switch (msg) {
+            case "MD":
+                moveActions.put(characterId, Movable.Direction.DOWN);
+                return;
 
-                case PLANT_BOMB:
-                    plantBombActions.put(characterId, message.plantBombData());
-                    return;
+            case "ML":
+                moveActions.put(characterId, Movable.Direction.LEFT);
+                return;
 
-                default:
-            }
-        } catch (RuntimeException e) {
-            log.error("Invalid message data for topic {}: {}.", message.topic, message.data);
-            e.printStackTrace();
+            case "MR":
+                moveActions.put(characterId, Movable.Direction.RIGHT);
+                return;
+
+            case "MU":
+                moveActions.put(characterId, Movable.Direction.UP);
+                return;
+
+            case "PB":
+                plantBombActions.add(characterId);
+                return;
+
+            default:
+                log.error("Invalid message: {}", msg);
         }
     }
 

@@ -10,11 +10,15 @@ public class SolidWall extends GameObject {
 
 
     @Override
-    public String toJson() {
-        StringBuilder result = new StringBuilder();
-        result.append("{\"type\":\"Wall\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(getX() / Level.TILE_WIDTH)
-                .append(", \"y\":").append(getY() / Level.TILE_HEIGHT).append("}}");
-        return result.toString();
+    public void addToReplica(StringBuilder sb) {
+        sb.append("w(").append(id)
+                .append(",").append(getX())
+                .append(",").append(getY())
+                .append(")\n");
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'w';
     }
 }

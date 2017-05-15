@@ -18,11 +18,15 @@ public class BreakableWall extends GameObject implements Destructible {
     }
 
     @Override
-    public String toJson() {
-        StringBuilder result = new StringBuilder();
-        result.append("{\"type\":\"Wood\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(getX() / Level.TILE_WIDTH)
-                .append(", \"y\":").append(getY() / Level.TILE_HEIGHT).append("}}");
-        return result.toString();
+    public void addToReplica(StringBuilder sb) {
+        sb.append("x(").append(id)
+                .append(",").append(getX())
+                .append(",").append(getY())
+                .append(")\n");
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'x';
     }
 }

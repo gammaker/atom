@@ -3,7 +3,6 @@ package ru.atom.gameserver.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.atom.gameserver.geometry.Point;
-import ru.atom.gameserver.message.Message;
 import ru.atom.gameserver.network.TickEventContext;
 
 import java.util.ArrayList;
@@ -19,14 +18,16 @@ public class GameSession {
     }
 
     private List<GameObject> gameObjects = new ArrayList<>();
+    private List<GameObject> newGameObjects = new ArrayList<>();
+    private StringBuilder replica = new StringBuilder();
 
     public List<GameObject> getGameObjects() {
         return new ArrayList<>(gameObjects);
     }
 
-    private char [][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
+    private char[][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
 
-    public void initializeGameMap(char [][] gameMap) {
+    public void initializeGameMap(char[][] gameMap) {
         this.gameMap = gameMap;
     }
 
@@ -43,50 +44,33 @@ public class GameSession {
         onObjectDestroy(obj);
     }
 
-    public void onObjectMove(Character obj, Point newPos) {
+    public void onObjectMove(GameObject obj, Point newPos) {
         gameMap[obj.IndexY()][obj.IndexX()] = ' ';
         obj.pos = newPos;
-        gameMap[obj.IndexY()][obj.IndexX()] = 'c';
+        gameMap[obj.IndexY()][obj.IndexX()] = obj.getCharCode();
+
+        replica.append("M(").append(obj.id)
+                .append(",").append((newPos.x + 500) / 1000)
+                .append(",").append((newPos.y + 500) / 1000)
+                .append(")\n");
     }
 
     public void onObjectMove(int id, Point newPos) {
-        GameObject obj = getObject(id);
-        if(obj instanceof Character) onObjectMove((Character)obj, newPos);
+        onObjectMove(getObject(id), newPos);
     }
 
     public void addGameObject(GameObject gameObject) {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
-        gameObjects.add(gameObject);
+        newGameObjects.add(gameObject);
     }
 
     public GameObject getObject(int id) {
         for (GameObject obj : gameObjects) {
             if (obj.id == id) return obj;
         }
-        return null;
-    }
-
-    public Movable getMovable(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Movable) return (Movable)getObject(id);
-        return null;
-    }
-
-    public Tickable getTickable(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Tickable) return (Tickable)getObject(id);
-        return null;
-    }
-
-    public Destructible getTemporary(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Destructible) return (Destructible)getObject(id);
-        return null;
-    }
-
-    public Character getCharacter(int id) {
-        GameObject obj = getObject(id);
-        if (obj instanceof Character) return (Character)getObject(id);
+        for (GameObject obj : newGameObjects) {
+            if (obj.id == id) return obj;
+        }
         return null;
     }
 
@@ -98,41 +82,58 @@ public class GameSession {
             if (!(obj instanceof Character)) continue;
             if (charactersToSkip-- == 0) return (Character)obj;
         }
+        for (GameObject obj : newGameObjects) {
+            if (!(obj instanceof Character)) continue;
+            if (charactersToSkip-- == 0) return (Character)obj;
+        }
         return null;
     }
 
-    public void tick(long elapsed, TickEventContext tickEvents) {
+    private static boolean objectIsDead(GameObject obj) {
+        if (!(obj instanceof Destructible)) return false;
+        return ((Destructible) obj).isDead();
+    }
+
+    private void processCharacterActions(Character character, TickEventContext tickEvents) {
+        Movable.Direction direction = null;
+        if (tickEvents != null) direction = tickEvents.moveActions.get(character.id);
+        if (direction == null) direction = Movable.Direction.IDLE;
+        character.setMotionDirection(direction);
+
+        if (tickEvents == null) return;
+
+        if (tickEvents.plantBombActions.contains(character.id)) {
+            character.plantBomb();
+        }
+
+        if (tickEvents.dieActions.contains(character.id)) {
+            character.die();
+        }
+    }
+
+    public StringBuilder tick(long elapsed, TickEventContext tickEvents) {
         ArrayList<GameObject> livingObjects = new ArrayList<>(gameObjects.size());
         for (GameObject gameObject : gameObjects) {
             if (gameObject instanceof Character) {
-                final Character character = (Character) gameObject;
-
-                final Message.MoveData md = tickEvents == null ? null :
-                        tickEvents.moveActions.get(character.id);
-
-                if (md != null) character.setMotionDirection(md.direction);
-                else character.setMotionDirection(Movable.Direction.IDLE);
-
-                if (tickEvents.dieActions.contains(character.id))
-                    character.die();
+                processCharacterActions((Character) gameObject, tickEvents);
             }
-            final boolean deleteCurrentObject = gameObject instanceof Destructible
-                    && ((Destructible) gameObject).isDead();
-            if (!deleteCurrentObject) livingObjects.add(gameObject);
-        }
-        for (GameObject gameObject : livingObjects) {
-            if (gameObject instanceof Character) {
-                final Character character = (Character) gameObject;
 
-                final Message.PlantBombData pbd = tickEvents == null ? null :
-                        tickEvents.plantBombActions.get(character.id);
-
-                if (pbd != null) character.plantBomb();
-            }
             if (gameObject instanceof Tickable) {
                 ((Tickable) gameObject).tick(elapsed);
             }
+
+            if (!objectIsDead(gameObject)) livingObjects.add(gameObject);
+            else replica.append("D(").append(gameObject.id).append(")\n");
         }
+        for (GameObject gameObject : newGameObjects) {
+            livingObjects.add(gameObject);
+            gameObject.addToReplica(replica);
+        }
+        newGameObjects.clear();
         gameObjects = livingObjects;
+
+        final StringBuilder curReplica = replica;
+        replica = new StringBuilder();
+        return curReplica;
     }
 }

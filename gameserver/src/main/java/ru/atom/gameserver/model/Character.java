@@ -8,8 +8,8 @@ import ru.atom.gameserver.geometry.Point;
  */
 public class Character extends GameObject implements Movable, Destructible {
 
-    private final static int HEIGHT = Level.TILE_HEIGHT;
-    private final static int WIDTH = Level.TILE_WIDTH;
+    private static final int HEIGHT = Level.TILE_HEIGHT;
+    private static final int WIDTH = Level.TILE_WIDTH;
 
     private static final int SPEED = 64;
     private Direction direction = Direction.IDLE;
@@ -73,7 +73,7 @@ public class Character extends GameObject implements Movable, Destructible {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(getX(), getY(), 5000, session));
+        session.addGameObject(new Bomb(getX(), getY(), 5000, 1, session));
         timeForNextBomb = 5000;
         return true;
     }
@@ -134,12 +134,11 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     @Override
-    public String toJson() {
-        StringBuilder result = new StringBuilder();
-        result.append("{\"type\":\"Pawn\", \"id\":").append(id)
-                .append(", \"position\":{\"x\":").append(getX())
-                .append(", \"y\":").append(getY()).append("}}");
-        return result.toString();
+    public void addToReplica(StringBuilder sb) {
+        sb.append("c(").append(id)
+                .append(",").append(getX())
+                .append(",").append(getY())
+                .append(")\n");
     }
 
     public void die() {
@@ -149,5 +148,10 @@ public class Character extends GameObject implements Movable, Destructible {
     @Override
     public boolean isDead() {
         return pos == null;
+    }
+
+    @Override
+    public char getCharCode() {
+        return 'c';
     }
 }

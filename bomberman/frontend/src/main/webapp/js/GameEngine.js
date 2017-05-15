@@ -208,20 +208,32 @@ GameEngine = Class.extend({
             gGameEngine.mute = true;
             gGameEngine.soundtrack.pause();
         }
-    },
-
-    gc: function(survivors) {
-        [this.players, this.tiles, this.bombs, this.bonuses].forEach(function (it) {
-            it.forEach(function(item, index, arr) {
-                if (!survivors.has(item.id)) {
-                    item.remove();
-                    arr.splice(index, 1);
-                }
-            });
-        });
-
     }
 
 });
 
 gGameEngine = new GameEngine();
+
+GameEngine.findAnyObject = function (id) {
+    var obj = gGameEngine.players.find(function (el) {
+        return el.id === id;
+    });
+    if (obj) return obj;
+    obj = gGameEngine.bombs.find(function (el) {
+        return el.id === id;
+    });
+    if (obj) return obj;
+    obj = gGameEngine.bonuses.find(function (el) {
+        return el.id === id;
+    });
+    if (obj) return obj;
+    obj = gGameEngine.fires.find(function (el) {
+        return el.id === id;
+    });
+    if (obj) return obj;
+    obj = gGameEngine.tiles.find(function (el) {
+        return el.id === id;
+    });
+    if (obj) return obj;
+    return null;
+};

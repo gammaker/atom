@@ -7,24 +7,24 @@ ServerProxy = Class.extend({
     handler: {},
 
     init: function() {
-        this.handler['REPLICA'] = gMessages.handleReplica;
-        this.handler['POSSESS'] = gMessages.handlePossess;
+        this.handler['Replica'] = gMessages.handleReplica;
+        this.handler['Possess'] = gMessages.handlePossess;
 
         var self = this;
         gInputEngine.subscribe('up', function() {
-            self.socket.send(gMessages.move('up'))
+            self.socket.send('MU')
         });
         gInputEngine.subscribe('down', function() {
-            self.socket.send(gMessages.move('down'))
+            self.socket.send('MD')
         });
         gInputEngine.subscribe('left', function() {
-            self.socket.send(gMessages.move('left'))
+            self.socket.send('ML')
         });
         gInputEngine.subscribe('right', function() {
-            self.socket.send(gMessages.move('right'))
+            self.socket.send('MR')
         });
         gInputEngine.subscribe('bomb', function() {
-            self.socket.send(gMessages.plantBomb())
+            self.socket.send('PB')
         });
 
         this.initSocket();
@@ -49,11 +49,14 @@ ServerProxy = Class.extend({
         };
 
         this.socket.onmessage = function(event) {
-            var msg = JSON.parse(event.data);
-            if (self.handler[msg.topic] === undefined)
+            //split message in format topic(params)
+            var bracketPos = event.data.indexOf('(');
+            var topic = event.data.substr(0, bracketPos);
+            var params = event.data.substr(bracketPos + 1, event.data.length - bracketPos - 2);
+            if (self.handler[topic] === undefined)
                 return;
 
-            self.handler[msg.topic](msg);
+            self.handler[topic](params);
         };
 
         this.socket.onerror = function(error) {
