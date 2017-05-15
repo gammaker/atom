@@ -2,6 +2,7 @@ package ru.atom.gameserver.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.atom.gameserver.geometry.Point;
 import ru.atom.gameserver.message.Message;
 import ru.atom.gameserver.network.TickEventContext;
 
@@ -23,7 +24,35 @@ public class GameSession {
         return new ArrayList<>(gameObjects);
     }
 
-    public static char [][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
+    private char [][] gameMap = new char[Level.HEIGHT][Level.WIDTH];
+
+    public void initializeGameMap(char [][] gameMap) {
+        this.gameMap = gameMap;
+    }
+
+    public char[][] getGameMap() {
+        return gameMap;
+    }
+
+    public void onObjectDestroy(GameObject obj) {
+        gameMap[obj.IndexX()][obj.IndexY()] = ' ';
+    }
+
+    public void onObjectDestroy(int id) {
+        GameObject obj = getObject(id);
+        onObjectDestroy(obj);
+    }
+
+    public void onObjectMove(Character obj, Point newPos) {
+        gameMap[obj.IndexY()][obj.IndexX()] = ' ';
+        obj.pos = newPos;
+        gameMap[obj.IndexY()][obj.IndexX()] = 'c';
+    }
+
+    public void onObjectMove(int id, Point newPos) {
+        GameObject obj = getObject(id);
+        if(obj instanceof Character) onObjectMove((Character)obj, newPos);
+    }
 
     public void addGameObject(GameObject gameObject) {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);

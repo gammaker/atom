@@ -52,10 +52,12 @@ public class Level {
 
     public static void loadGameMap(String resourceName, GameSession game) {
         final InputStream stream = GameServer.class.getResourceAsStream(resourceName);
+        char [][] map = new char[Level.HEIGHT][Level.WIDTH];
         for (int y = 0; y < Level.HEIGHT; y++) {
             for (int x = 0; x < Level.WIDTH; x++) {
-                game.gameMap[HEIGHT - 1 - y][x] = Level.nextChar(stream);
+                map[HEIGHT - 1 - y][x] = Level.nextChar(stream);
             }
         }
+        game.initializeGameMap(map);
     }
 }

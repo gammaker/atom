@@ -32,5 +32,13 @@ public abstract class GameObject {
         return (pos.y + 500) / 1000;
     }
 
+    public int IndexX() {
+        return (getX()+Level.TILE_WIDTH/2)/Level.TILE_WIDTH;
+    }
+
+    public int IndexY() {
+        return (getY()+Level.TILE_HEIGHT/2)/Level.TILE_HEIGHT;
+    }
+
     public abstract String toJson();
 }
