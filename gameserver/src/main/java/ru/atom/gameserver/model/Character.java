@@ -47,7 +47,7 @@ public class Character extends GameObject implements Movable, Destructible {
             Bar barCharacter;
             switch (direction) {
                 case UP:
-                    barCharacter = new Bar(getX(), getY() + 1, getX() + WIDTH, getY() + 1 + HEIGHT);
+                    barCharacter = new Bar(getX() + 1, getY() + 2, getX() - 2 + WIDTH, getY() - 1 + HEIGHT);
                     //printCharacter(barCharacter);
                     for (int i = -1; i <= 1; i++) {
                         indexX+=i;
@@ -64,9 +64,8 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     ypos += delta;
                     break;
-
                 case DOWN:
-                    barCharacter = new Bar(getX(), getY() - 1, getX() + WIDTH, getY() - 1 + HEIGHT);
+                    barCharacter = new Bar(getX() + 1, getY(), getX() - 2 + WIDTH, getY() - 3 + HEIGHT);
                     //printCharacter(barCharacter);
                     for (int i = -1; i <= 1; i++) {
                         indexX+=i;
@@ -83,9 +82,8 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     ypos -= delta;
                     break;
-
                 case LEFT:
-                    barCharacter = new Bar(getX() - 1, getY(), getX() - 1 + WIDTH, getY() + HEIGHT);
+                    barCharacter = new Bar(getX(), getY() + 1, getX() - 3 + WIDTH, getY() - 2 + HEIGHT);
                     //printCharacter(barCharacter);
                     for (int i = -1; i <= 1; i++) {
                         indexY += i;
@@ -102,9 +100,8 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     xpos -= delta;
                     break;
-
                 case RIGHT:
-                    barCharacter = new Bar(getX() + 1, getY(), getX() + 1 + WIDTH, getY() + HEIGHT);
+                    barCharacter = new Bar(getX() + 2, getY() + 1, getX() - 1 + WIDTH, getY() - 2 + HEIGHT);
                     //printCharacter(barCharacter);
                     for (int i = -1; i <= 1; i++) {
                         indexY += i;
@@ -121,7 +118,6 @@ public class Character extends GameObject implements Movable, Destructible {
                     if (flag) break;
                     xpos += delta;
                     break;
-
                 default:
             }
             GameSession.gameMap[IndexY()][IndexX()] = ' ';
@@ -131,7 +127,7 @@ public class Character extends GameObject implements Movable, Destructible {
         }
         catch (Exception e) {
             //Maybe ArrayIndexOutOfBoundsException
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
     }
 
