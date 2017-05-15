@@ -30,8 +30,8 @@ public class GameSession {
         this.gameMap = gameMap;
     }
 
-    public char[][] getGameMap() {
-        return gameMap;
+    public char getGameMapChar(int y, int x) {
+        return gameMap[y][x];
     }
 
     public void onObjectDestroy(GameObject obj) {
