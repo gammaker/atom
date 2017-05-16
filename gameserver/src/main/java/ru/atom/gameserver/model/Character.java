@@ -104,7 +104,7 @@ public class Character extends GameObject implements Movable, Destructible {
                 Bar barWall = createWallBar(indexX, indexY, x, y);
                 if (barCharacter.isColliding(barWall)) {
                     if (mapChar == 'b') {
-                        pickBonus(indexX, indexY);
+                        pickBonus(indexX + x, indexY + y);
                         continue;
                     }
                     return true;
