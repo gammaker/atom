@@ -1,5 +1,6 @@
 package ru.atom.gameserver.model;
 
+import ru.atom.gameserver.geometry.Bar;
 import ru.atom.gameserver.network.GameServer;
 
 import java.io.IOException;
@@ -54,5 +55,10 @@ public class Level {
         }
         // Characters must be added to scene after all other objects to be on top of all objects.
         for (GameObject ch : characters) game.addGameObject(ch);
+    }
+
+    public static Bar createTileBar(int indexX, int indexY) {
+        return Bar.fromPosAndSize(indexX * Level.TILE_WIDTH, indexY * Level.TILE_HEIGHT,
+                Level.TILE_WIDTH, Level.TILE_HEIGHT);
     }
 }

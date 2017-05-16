@@ -33,8 +33,11 @@ public class GameSession {
     }
 
     public void onObjectDestroy(GameObject obj) {
-        if (gameMap[obj.IndexY()][obj.IndexX()] == obj.getCharCode()) {
-            gameMap[obj.IndexY()][obj.IndexX()] = ' ';
+        if (obj.IndexX() >= 0 && obj.IndexX() < Level.WIDTH &&
+                obj.IndexY() >= 0 & obj.IndexY() < Level.HEIGHT) {
+            if (gameMap[obj.IndexY()][obj.IndexX()] == obj.getCharCode()) {
+                gameMap[obj.IndexY()][obj.IndexX()] = ' ';
+            }
         }
     }
 
@@ -44,10 +47,10 @@ public class GameSession {
     }
 
     public void onObjectMove(GameObject obj, Point newPos) {
-        char c = gameMap[obj.IndexY()][obj.IndexX()];
+        final char c = gameMap[obj.IndexY()][obj.IndexX()];
         if (c == obj.getCharCode()) {
             gameMap[obj.IndexY()][obj.IndexX()] = ' ';
-            gameMap[(newPos.y + 500) / 1000][(newPos.x + 500) / 1000] = c;
+            gameMap[(newPos.y + 500) / (1000 * Level.TILE_WIDTH)][(newPos.x + 500) / (1000 * Level.TILE_HEIGHT)] = c;
         }
 
         replica.append("M(").append(obj.id)

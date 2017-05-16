@@ -9,6 +9,10 @@ public class Bar implements Collider {
     private int width;
     private int height;
 
+    public Bar() {
+
+    }
+
     public Bar(int x1, int y1, int x2, int y2) {
         setFromCorners(x1, y1, x2, y2);
     }
@@ -19,6 +23,15 @@ public class Bar implements Collider {
         setWidth(x2 - x1);
         setHeight(y2 - y1);
         return this;
+    }
+
+    public static Bar fromPosAndSize(int x, int y, int width, int height) {
+        final Bar bar = new Bar();
+        bar.left = x;
+        bar.bottom = y;
+        bar.setWidth(width);
+        bar.setHeight(height);
+        return bar;
     }
 
     public Bar setLeftX(int x) {
@@ -65,6 +78,9 @@ public class Bar implements Collider {
         return height;
     }
 
+    public Bar offset(int dx, int dy) {
+        return new Bar(left + dx, bottom + dy, width, height);
+    }
 
     @Override
     public boolean isColliding(Collider other) {
@@ -73,13 +89,13 @@ public class Bar implements Collider {
         return false;
     }
 
-    boolean isColliding(Point point) {
+    public boolean isColliding(Point point) {
         final boolean intersectsX = point.x >= left && point.x <= left + width;
         final boolean intersectsY = point.y >= bottom && point.y <= bottom + height;
         return intersectsX && intersectsY;
     }
 
-    boolean isColliding(Bar bar) {
+    public boolean isColliding(Bar bar) {
         return left <= bar.left + bar.width
                 && left + width >= bar.left
                 && bottom + height >= bar.bottom

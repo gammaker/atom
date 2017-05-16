@@ -29,6 +29,7 @@ public class Character extends GameObject implements Movable, Destructible {
 
     @Override
     public void tick(long elapsed) {
+        if (isDead()) return;
         if (direction != Direction.IDLE) move(elapsed);
         timeForNextBomb -= elapsed;
         if (timeForNextBomb < 0) timeForNextBomb = 0;
@@ -45,31 +46,31 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     private void move(long elapsed) {
+        if (pos == null) return;
         int xpos = pos.x;
         int ypos = pos.y;
         final int delta = (int) (speed * elapsed);
-        int indexY = IndexY();
-        int indexX = IndexX();
         try {
             switch (direction) {
                 case UP:
-                    if (collisionFlag(indexX, indexY, 0, 1, delta)) break;
+                    if (collisionFlag(0, delta)) break;
                     ypos += delta;
                     break;
                 case DOWN:
-                    if (collisionFlag(indexX, indexY, 0, -1, delta)) break;
+                    if (collisionFlag(0, -delta)) break;
                     ypos -= delta;
                     break;
                 case LEFT:
-                    if (collisionFlag(indexX, indexY, -1, 0, delta)) break;
+                    if (collisionFlag(-delta, 0)) break;
                     xpos -= delta;
                     break;
                 case RIGHT:
-                    if (collisionFlag(indexX, indexY, 1, 0, delta)) break;
+                    if (collisionFlag(delta, 0)) break;
                     xpos += delta;
                     break;
                 default:
             }
+            if (xpos == pos.x && ypos == pos.y) return;
             final Point newPos = new Point(xpos, ypos);
             session.onObjectMove(this, newPos);
             pos = newPos;
@@ -88,30 +89,31 @@ public class Character extends GameObject implements Movable, Destructible {
         return true;
     }
 
-    private boolean collisionFlag(int indexX, int indexY, int x, int y, int delta) {
-        boolean flag = false;
-        Bar barCharacter = createCharacterBar(x, y, delta);
-        if(x == 0) {
-            indexX -= 2;
-            flag = true;
-        }
-        else if(y == 0) indexY -= 2;
-        for (int i = 0; i <= 2; i++) {
-            if(flag) indexX++;
-            else indexY++;
-            final char mapChar = session.getGameMapChar(indexY + y, indexX + x);
-            if (mapChar == 'w' || mapChar == 'x' || mapChar == 'b') {
-                Bar barWall = createWallBar(indexX, indexY, x, y);
-                if (barCharacter.isColliding(barWall)) {
-                    if (mapChar == 'b') {
-                        pickBonus(indexX + x, indexY + y);
-                        continue;
+    private boolean collisionFlag(int dx, int dy) {
+        final int tileX = (pos.x + dx + 500) / (1000 * Level.TILE_WIDTH);
+        final int tileY = (pos.y + dy + 500) / (1000 * Level.TILE_HEIGHT);
+        final Bar barCharacter = createCharacterBar(dx, dy);
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                final char mapChar = session.getGameMapChar(tileY + j, tileX + i);
+                if (mapChar == 'w' || mapChar == 'x' || mapChar == 'b') {
+                    final Bar tileBar = Level.createTileBar(tileX + i, tileY + j);
+                    if (barCharacter.isColliding(tileBar)) {
+                        if (mapChar == 'b') {
+                            pickBonus(tileX + i, tileY + j);
+                            continue;
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
         }
         return false;
+    }
+
+    public boolean intersectsTile(int tileX, int tileY) {
+        return Level.createTileBar(tileX, tileY)
+                .isColliding(createCharacterBar());
     }
 
     private void pickBonus(int tileX, int tileY) {
@@ -136,16 +138,14 @@ public class Character extends GameObject implements Movable, Destructible {
         }
     }
 
-    private Bar createCharacterBar(int x, int y, int delta) {
-        return new Bar((pos.x + delta + 500) / 1000 + x,
-                (pos.y + delta + 500) / 1000 + y,
-                (pos.x - delta + 500) / 1000 + x + WIDTH,
-                (pos.y -delta + 500) / 1000 + y + HEIGHT);
+    public Bar createCharacterBar(int dx, int dy) {
+        return Bar.fromPosAndSize((pos.x + dx + 500) / 1000 + 2,
+                (pos.y + dy + 500) / 1000 + 2,
+                WIDTH - 4, HEIGHT - 4);
     }
 
-    private Bar createWallBar(int indexX, int indexY, int x, int y) {
-        return new Bar((indexX + x) * WIDTH, (indexY + y) * HEIGHT,
-                (indexX + x + 1) * WIDTH, (indexY + y + 1) * HEIGHT);
+    public Bar createCharacterBar() {
+        return Bar.fromPosAndSize(getX() + 2, getY() + 2, WIDTH - 4, HEIGHT - 4);
     }
 
     @Override

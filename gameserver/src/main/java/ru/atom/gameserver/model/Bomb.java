@@ -34,15 +34,20 @@ public class Bomb extends GameObject implements Temporary {
         for (GameObject obj : session.getGameObjects()) {
             if (!(obj instanceof Destructible)) continue;
             if (((Destructible) obj).isDead()) continue;
-            if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
-            if (obj instanceof BreakableWall) ((BreakableWall) obj).destroy();
-            else if (obj instanceof Character) ((Character) obj).die();
+            if (obj instanceof BreakableWall) {
+                if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
+                ((BreakableWall) obj).destroy();
+            }
+            else if (obj instanceof Character) {
+                Character character = (Character) obj;
+                if (!character.intersectsTile(tileX, tileY)) continue;
+                character.die();
+            }
         }
     }
 
     private void placeFire(int tileX, int tileY) {
-        final char ch = session.getGameMapChar(tileY, tileX);
-        if (ch == 'c' || ch == 'x' || ch == 'b') killObjectsInTile(tileX, tileY);
+        killObjectsInTile(tileX, tileY);
         session.addGameObject(new Fire(tileX * Level.TILE_WIDTH,
                 tileY * Level.TILE_HEIGHT, 1000, session));
     }
