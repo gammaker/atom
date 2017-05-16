@@ -47,7 +47,7 @@ public class GameSession {
         char c = gameMap[obj.IndexY()][obj.IndexX()];
         if (c == obj.getCharCode()) {
             gameMap[obj.IndexY()][obj.IndexX()] = ' ';
-            gameMap[(newPos.y + 500) / 1000][(newPos.y + 500) / 1000] = c;
+            gameMap[(newPos.y + 500) / 1000][(newPos.x + 500) / 1000] = c;
         }
 
         replica.append("M(").append(obj.id)
