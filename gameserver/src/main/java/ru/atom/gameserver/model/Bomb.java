@@ -42,7 +42,7 @@ public class Bomb extends GameObject implements Temporary {
 
     private void placeFire(int tileX, int tileY) {
         final char ch = session.getGameMapChar(tileY, tileX);
-        if (ch == 'c' || ch == 'x') killObjectsInTile(tileX, tileY);
+        if (ch == 'c' || ch == 'x' || ch == 'b') killObjectsInTile(tileX, tileY);
         session.addGameObject(new Fire(tileX * Level.TILE_WIDTH,
                 tileY * Level.TILE_HEIGHT, 1000, session));
     }
