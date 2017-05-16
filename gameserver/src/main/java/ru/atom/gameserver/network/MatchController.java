@@ -18,6 +18,7 @@ public class MatchController {
     public static final int PLAYERS_PER_GAME = 4;
 
     public static class Player {
+        Session session;
         String name;
         long token;
         MatchData match;
@@ -25,7 +26,7 @@ public class MatchController {
         int characterId; // id of Character being controlled by player
 
         boolean isConnected() {
-            return characterId != -1;
+            return session != null;
         }
     }
 
@@ -41,6 +42,11 @@ public class MatchController {
             }
             return true;
         }
+
+        public void broadcast(String msg) {
+            log.info("BROADCASTING (game {}): {}", id, msg);
+            for (Player player : players) ConnectionPool.send(player.session, msg);
+        }
     }
 
     private static final HashMap<Integer, MatchData> matches = new HashMap<>();
@@ -53,7 +59,6 @@ public class MatchController {
         player.name = playerName;
         player.id = playerId;
         player.token = token;
-        player.characterId = -1;
         synchronized (matches) {
             MatchData data;
             if (matches.containsKey(gameSessionId)) {
@@ -64,12 +69,18 @@ public class MatchController {
                 }
             } else {
                 data = new MatchData();
-                data.ticker = new GameSessionTicker();
+                data.ticker = new GameSessionTicker(data);
                 data.id = gameSessionId;
                 Level.load("/map.txt", data.ticker.gameSession);
                 matches.put(gameSessionId, data);
             }
             player.match = data;
+            final Character character = player.match.ticker.gameSession.getCharacterByPlayerId(player.id);
+            if (character == null) {
+                log.error("Invalid player id {} of player {}.", player.id, player.name);
+                return false;
+            }
+            player.characterId = character.id;
             data.players.add(player);
             tokenToPlayer.put(token, player);
         }
@@ -91,12 +102,7 @@ public class MatchController {
             log.warn("Player {} is already connected!", player.name);
             return;
         }
-        final Character character = player.match.ticker.gameSession.getCharacterByPlayerId(player.id);
-        if (character == null) {
-            log.error("Invalid player id {} of player {}.", player.id, player.name);
-            return;
-        }
-        player.characterId = character.id;
+        player.session = session;
         Broker.send(session, "Possess(" + player.characterId + ")");
         log.info("Player {} connected to his game session!", player.name);
         if (player.match.areAllPlayersConnected()) {

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.atom.gameserver.model.GameSession;
 import ru.atom.gameserver.network.Broker;
+import ru.atom.gameserver.network.MatchController;
 import ru.atom.gameserver.network.TickEventContext;
 
 import java.util.concurrent.TimeUnit;
@@ -19,6 +20,8 @@ public class GameSessionTicker extends Thread {
 
     private TickEventContext eventContext = new TickEventContext();
 
+    private MatchController.MatchData match;
+
     public synchronized TickEventContext startNextTick() {
         final TickEventContext result = eventContext;
         eventContext = new TickEventContext();
@@ -31,6 +34,10 @@ public class GameSessionTicker extends Thread {
 
     public synchronized void addDieEvent(int objectId) {
         eventContext.addDieEvent(objectId);
+    }
+
+    public GameSessionTicker(MatchController.MatchData match) {
+        this.match = match;
     }
 
     @Override
@@ -54,10 +61,7 @@ public class GameSessionTicker extends Thread {
         final TickEventContext prevTickContext = startNextTick();
         final String replica = gameSession.tick(time, prevTickContext).toString();
         if (replica.isEmpty()) return; //Nothing changed, no need to send replica.
-        Broker.broadcast("Replica(\n" + replica + ")");
-    }
-
-    public long getTickNumber() {
-        return tickNumber;
+        if (match == null) return;
+        match.broadcast("Replica(\n" + replica + ")");
     }
 }
