@@ -13,17 +13,13 @@ public abstract class GameObject {
     protected Point pos;
 
     public GameObject(int x, int y, GameSession session) {
-        pos = new Point(x*1000, y*1000);
+        pos = new Point(x * 1000, y * 1000);
         id = session.getUniqueId();
         this.session = session;
     }
 
-    public Point getPosition1000() {
-        return pos;
-    }
-
     public Point getPosition() {
-        return new Point(pos.x/1000, pos.y/1000);
+        return new Point(pos.x / 1000, pos.y / 1000);
     }
 
     // x coordinate in pixels
@@ -38,12 +34,12 @@ public abstract class GameObject {
 
     public abstract void addToReplica(StringBuilder sb);
 
-    public int IndexX() {
+    public int getTileX() {
         return (getX() + Level.TILE_WIDTH / 2) / Level.TILE_WIDTH;
     }
 
-    public int IndexY() {
-        return (getY() + Level.TILE_HEIGHT/2) / Level.TILE_HEIGHT;
+    public int getTileY() {
+        return (getY() + Level.TILE_HEIGHT / 2) / Level.TILE_HEIGHT;
     }
 
     public abstract char getCharCode();

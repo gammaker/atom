@@ -74,8 +74,7 @@ public class Character extends GameObject implements Movable, Destructible {
             final Point newPos = new Point(xpos, ypos);
             session.onObjectMove(this, newPos);
             pos = newPos;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //Maybe ArrayIndexOutOfBoundsException
             System.out.println(e.getMessage());
         }
@@ -83,8 +82,8 @@ public class Character extends GameObject implements Movable, Destructible {
 
     public boolean plantBomb() {
         if (timeForNextBomb > 0) return false;
-        session.addGameObject(new Bomb(IndexX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 4,
-                IndexY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 4, 2500, bombStrength, session));
+        session.addGameObject(new Bomb(getTileX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 4,
+                getTileY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 4, 2500, bombStrength, session));
         timeForNextBomb = bombDelay;
         return true;
     }
@@ -119,7 +118,7 @@ public class Character extends GameObject implements Movable, Destructible {
     private void pickBonus(int tileX, int tileY) {
         for (GameObject obj : session.getGameObjects()) {
             if (!(obj instanceof Bonus)) continue;
-            if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
+            if (obj.getTileX() != tileX || obj.getTileY() != tileY) continue;
             final Bonus bonus = (Bonus) obj;
             switch (bonus.type) {
                 case SPEED:
@@ -133,15 +132,15 @@ public class Character extends GameObject implements Movable, Destructible {
                 case FIRE:
                     bombStrength = BONUS_BOMB_STRENGTH;
                     break;
+
+                default:
             }
             bonus.destroy();
         }
     }
 
     public Bar createCharacterBar(int dx, int dy) {
-        return Bar.fromPosAndSize((pos.x + dx + 500) / 1000 + 4,
-                (pos.y + dy + 500) / 1000 + 4,
-                WIDTH, HEIGHT );
+        return Bar.fromPosAndSize((pos.x + dx + 500) / 1000 + 4, (pos.y + dy + 500) / 1000 + 4, WIDTH, HEIGHT);
     }
 
     public Bar createCharacterBar() {

@@ -35,10 +35,9 @@ public class Bomb extends GameObject implements Temporary {
             if (!(obj instanceof Destructible)) continue;
             if (((Destructible) obj).isDead()) continue;
             if (obj instanceof BreakableWall) {
-                if (obj.IndexX() != tileX || obj.IndexY() != tileY) continue;
+                if (obj.getTileX() != tileX || obj.getTileY() != tileY) continue;
                 ((BreakableWall) obj).destroy();
-            }
-            else if (obj instanceof Character) {
+            } else if (obj instanceof Character) {
                 Character character = (Character) obj;
                 if (!character.intersectsTile(tileX, tileY)) continue;
                 character.die();
@@ -53,8 +52,8 @@ public class Bomb extends GameObject implements Temporary {
     }
 
     private void explode() {
-        final int tileX = IndexX();
-        final int tileY = IndexY();
+        final int tileX = getTileX();
+        final int tileY = getTileY();
         placeFire(tileX, tileY);
         for (int x = tileX - 1; x >= tileX - strength; x--) {
             if (session.getGameMapChar(tileY, x) == 'w') break;

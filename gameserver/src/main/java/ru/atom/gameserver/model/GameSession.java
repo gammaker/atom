@@ -33,18 +33,18 @@ public class GameSession {
     }
 
     public void onObjectDestroy(GameObject obj) {
-        if (obj.IndexX() >= 0 && obj.IndexX() < Level.WIDTH &&
-                obj.IndexY() >= 0 & obj.IndexY() < Level.HEIGHT) {
-            if (gameMap[obj.IndexY()][obj.IndexX()] == obj.getCharCode()) {
-                gameMap[obj.IndexY()][obj.IndexX()] = ' ';
+        if (obj.getTileX() >= 0 && obj.getTileX() < Level.WIDTH
+                && obj.getTileY() >= 0 && obj.getTileY() < Level.HEIGHT) {
+            if (gameMap[obj.getTileY()][obj.getTileX()] == obj.getCharCode()) {
+                gameMap[obj.getTileY()][obj.getTileX()] = ' ';
             }
         }
     }
 
     public void onObjectMove(GameObject obj, Point newPos) {
-        final char c = gameMap[obj.IndexY()][obj.IndexX()];
+        final char c = gameMap[obj.getTileY()][obj.getTileX()];
         if (c == obj.getCharCode()) {
-            gameMap[obj.IndexY()][obj.IndexX()] = ' ';
+            gameMap[obj.getTileY()][obj.getTileX()] = ' ';
             final int newX = (newPos.x + 500) / 1000;
             final int newY = (newPos.y + 500) / 1000;
             final int newTileX = (newX + Level.TILE_WIDTH / 2) / Level.TILE_WIDTH;
@@ -66,7 +66,7 @@ public class GameSession {
         log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
         newGameObjects.add(gameObject);
         if (gameObject instanceof Fire) return;
-        gameMap[gameObject.IndexY()][gameObject.IndexX()] = gameObject.getCharCode();
+        gameMap[gameObject.getTileY()][gameObject.getTileX()] = gameObject.getCharCode();
     }
 
     public GameObject getObject(int id) {
