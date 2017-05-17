@@ -41,16 +41,15 @@ public class GameSession {
         }
     }
 
-    public void onObjectDestroy(int id) {
-        GameObject obj = getObject(id);
-        onObjectDestroy(obj);
-    }
-
     public void onObjectMove(GameObject obj, Point newPos) {
         final char c = gameMap[obj.IndexY()][obj.IndexX()];
         if (c == obj.getCharCode()) {
             gameMap[obj.IndexY()][obj.IndexX()] = ' ';
-            gameMap[(newPos.y + 500) / (1000 * Level.TILE_WIDTH)][(newPos.x + 500) / (1000 * Level.TILE_HEIGHT)] = c;
+            final int newX = (newPos.x + 500) / 1000;
+            final int newY = (newPos.y + 500) / 1000;
+            final int newTileX = (newX + Level.TILE_WIDTH / 2) / Level.TILE_WIDTH;
+            final int newTileY = (newY + Level.TILE_HEIGHT / 2) / Level.TILE_HEIGHT;
+            gameMap[newTileY][newTileX] = c;
         }
 
         replica.append("M(").append(obj.id)

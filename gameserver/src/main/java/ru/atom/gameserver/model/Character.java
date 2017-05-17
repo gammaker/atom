@@ -90,8 +90,8 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     private boolean collisionFlag(int dx, int dy) {
-        final int tileX = (pos.x + dx + 500) / (1000 * Level.TILE_WIDTH);
-        final int tileY = (pos.y + dy + 500) / (1000 * Level.TILE_HEIGHT);
+        final int tileX = (pos.x + dx + 2500) / (1000 * Level.TILE_WIDTH);
+        final int tileY = (pos.y + dy + 2500) / (1000 * Level.TILE_HEIGHT);
         final Bar barCharacter = createCharacterBar(dx, dy);
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
