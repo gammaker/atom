@@ -13,6 +13,8 @@ Messages = Class.extend({
     },
 
     handleReplica: function (msg) {
+        gGameEngine.playSoundtrack();
+
         var events = msg.split('\n');
 
         for (var i = 0; i < events.length; i++) {

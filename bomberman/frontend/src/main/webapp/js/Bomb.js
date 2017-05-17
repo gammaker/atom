@@ -73,5 +73,6 @@ Bomb = Entity.extend({
                 gGameEngine.bombs.splice(i, 1);
             }
         }
+        createjs.Sound.play("bomb");
     }
 });
