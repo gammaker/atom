@@ -81,6 +81,7 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     public boolean plantBomb() {
+        if (isDead()) return false;
         if (timeForNextBomb > 0) return false;
         session.addGameObject(new Bomb(getTileX() * Level.TILE_WIDTH + Level.TILE_WIDTH / 4,
                 getTileY() * Level.TILE_HEIGHT - Level.TILE_HEIGHT / 4, 2500, bombStrength, session));
