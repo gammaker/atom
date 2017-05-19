@@ -54,6 +54,7 @@ Messages = Class.extend({
         var obj = GameEngine.findAnyObject(id);
         if (!obj) return;
         if (obj.die !== undefined) obj.die();
+		if (obj.explodeSound !== undefined) obj.explodeSound();
         obj.remove();
     },
 

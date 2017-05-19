@@ -117,6 +117,7 @@ Player = Entity.extend({
     },
 
     remove: function() {
+		//gGameEngine.stage.removeChild(this.bmp); //breaks die animation, call die before this
         for (var i = 0; i < gGameEngine.players.length; i++) {
             var player = gGameEngine.players[i];
             if (this == player) {
