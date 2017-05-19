@@ -1,10 +1,8 @@
-# Java Technoatom
+Это форк репозитория курса Техноатом "Разработка на Java".
+Здесь расположен клон игры Bomberman - финальный проект нашей команды:
 
-[![Build Status](https://travis-ci.org/rybalkinsd/atom.png?branch=master)](https://travis-ci.org/rybalkinsd/atom)
-[![Coverage Status](https://coveralls.io/repos/github/rybalkinsd/atom/badge.png?branch=master)](https://coveralls.io/github/rybalkinsd/atom?branch=master)
+ - [Вольнов Александр](https://github.com/gammaker)
+ - [Квасный Алексей](https://github.com/Auerbah)
+ - [Фищенко Элла](https://github.com/Fellaru)
 
-[![](http://icons.iconarchive.com/icons/alecive/flatwoken/32/Apps-Telegram-icon.png) Join chat](https://t.me/joinchat/AAAAAEF63F9PvqE4JDzYdQ) - feel free to contact us
-
-
-Course repository.
-All course lectures/sources/tasks are available here.
+Основные фичи и архитектура показаны на [слайдах](Slides.pptx).
