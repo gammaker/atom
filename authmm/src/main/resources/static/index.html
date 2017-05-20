@@ -27,7 +27,7 @@
 
 <script>
     function newGame() {
-        var url = "http://"+window.location.hostname+":8081/mm/join?token=" + Cookies.get('token');
+        var url = "http://" + window.location.host + "/mm/join?token=" + Cookies.get('token');
         //window.location = url;
 
         var settings = {
@@ -56,7 +56,6 @@
 
         var settings = {
             "method": "POST",
-            "crossDomain": true,
             "url": "/auth/logout",
             headers: {
                 'Authorization': 'Bearer ' + Cookies.get('token')

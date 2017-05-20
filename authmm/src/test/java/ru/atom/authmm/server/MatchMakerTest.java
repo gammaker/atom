@@ -5,8 +5,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Ignore;
 import org.junit.Test;
+import ru.atom.authmm.server.auth.AuthMmServer;
 import ru.atom.authmm.server.auth.UserDao;
-import ru.atom.authmm.server.mm.MatchMakerServer;
 import ru.atom.authmm.server.auth.Database;
 import ru.atom.authmm.server.auth.Token;
 import ru.atom.authmm.server.auth.User;
@@ -31,7 +31,7 @@ public class MatchMakerTest {
 
     @Test
     public void testServer() throws Exception {
-        MatchMakerServer.serverRun();
+        AuthMmServer.serverRun();
 
         Session session = Database.session();
         UserDao ud = UserDao.getInstance();
@@ -66,6 +66,6 @@ public class MatchMakerTest {
             deleteUserCascade(session, "TestMMUser" + i);
         }
 
-        MatchMakerServer.serverStop();
+        AuthMmServer.serverStop();
     }
 }

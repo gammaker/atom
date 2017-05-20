@@ -1,6 +1,5 @@
 dependencies {
     testCompile rootProject.libraries.junit
-    compile rootProject.libraries.jackson
     compile rootProject.libraries.log4j
     compile rootProject.libraries.jetty_server
     compile rootProject.libraries.jetty_servlet
@@ -10,6 +9,11 @@ dependencies {
     compile rootProject.libraries.websocketapi
     compile rootProject.libraries.jersey_server
     compile rootProject.libraries.jersey_containers
+}
+
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest { attributes 'Main-Class': 'ru.atom.gameserver.network.GameServer' }
 }
 
 sourceSets {

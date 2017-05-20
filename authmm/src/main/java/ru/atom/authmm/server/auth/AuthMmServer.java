@@ -9,19 +9,23 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 
-public class AuthServer {
+public class AuthMmServer {
     private static Server jettyServer;
 
     public static void serverRun() throws Exception {
         Database.setUp();
 
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
+        final ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.setHandlers(new Handler[] {
                 createAuthContext(),
+                createMmContext(),
                 createResourceContext()
         });
 
-        jettyServer = new Server(8080);
+        final String portEnv = System.getenv("PORT");
+        final int port = portEnv == null ? 8080 : Integer.parseInt(portEnv);
+
+        jettyServer = new Server(port);
         jettyServer.setHandler(contexts);
 
         jettyServer.start();
@@ -37,7 +41,7 @@ public class AuthServer {
 
     private static ServletContextHandler createAuthContext() {
         ServletContextHandler context = new ServletContextHandler();
-        context.setContextPath("/auth/*");
+        context.setContextPath("/auth");
         ServletHolder jerseyServlet = context.addServlet(
                 org.glassfish.jersey.servlet.ServletContainer.class, "/*");
         jerseyServlet.setInitOrder(0);
@@ -47,9 +51,19 @@ public class AuthServer {
                 "ru.atom.authmm.server.auth"
         );
 
+        return context;
+    }
+
+    private static ServletContextHandler createMmContext() {
+        ServletContextHandler context = new ServletContextHandler();
+        context.setContextPath("/mm");
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+
         jerseyServlet.setInitParameter(
-                "com.sun.jersey.spi.container.ContainerResponseFilters",
-                CrossBrowserFilter.class.getCanonicalName()
+                "jersey.config.server.provider.packages",
+                "ru.atom.authmm.server.mm"
         );
 
         return context;
@@ -61,7 +75,7 @@ public class AuthServer {
         ResourceHandler handler = new ResourceHandler();
         handler.setWelcomeFiles(new String[]{"index.html"});
 
-        String serverRoot = AuthServer.class.getResource("/static").toString();
+        String serverRoot = AuthMmServer.class.getResource("/static").toString();
         handler.setResourceBase(serverRoot);
         context.setHandler(handler);
         return context;

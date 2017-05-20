@@ -14,10 +14,12 @@ import java.io.IOException;
  */
 public class GameServerClient {
     private static final OkHttpClient client = new OkHttpClient();
-    public static final String PROTOCOL = "http://";
-    public static final String HOST = "localhost";
-    public static final String PORT = ":8090";
-    public static final String URL = PROTOCOL + HOST + PORT;
+    public static final String URL;
+
+    static {
+        final String gameserverUrlEnv = System.getenv("GAME_SERVER_URL");
+        URL = "http://" + (gameserverUrlEnv == null ? "localhost:8090" : gameserverUrlEnv);
+    }
 
     public static Response addPlayer(int gameSessionId, int playerId, long token, String name) throws IOException {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");

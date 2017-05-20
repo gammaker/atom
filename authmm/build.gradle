@@ -14,7 +14,7 @@ dependencies {
 
 jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    manifest { attributes 'Main-Class': 'ru.atom.authmm.server.auth.AuthServer' }
+    manifest { attributes 'Main-Class': 'ru.atom.authmm.server.auth.AuthMmServer' }
 }
 
 

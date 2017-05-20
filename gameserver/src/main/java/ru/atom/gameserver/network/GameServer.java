@@ -9,8 +9,6 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import java.io.InputStream;
-
 public class GameServer {
     private static ContextHandler createGameClientContext() {
         ContextHandler context = new ContextHandler();
@@ -42,7 +40,11 @@ public class GameServer {
     public static void main(String[] args) {
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8090);
+
+        final String gameserverPortEnv = System.getenv("GAME_SERVER_PORT");
+        final int port = gameserverPortEnv == null ? 8090 : Integer.parseInt(gameserverPortEnv);
+
+        connector.setPort(port);
         server.addConnector(connector);
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();

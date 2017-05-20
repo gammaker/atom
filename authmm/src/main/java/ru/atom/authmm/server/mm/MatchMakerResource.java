@@ -28,7 +28,8 @@ public class MatchMakerResource {
     private static final int PLAYERS_PER_GAME = 4;
 
     static long counterStart() {
-        final Integer max = (Integer) Database.session().createNativeQuery("select max(gameId) from bomber.result")
+        final Integer max = (Integer) Database.session()
+                .createNativeQuery("select max(gameId) from bomber.result")
                 .uniqueResult();
         return max == null ? 0 : (max + 1) * 4;
     }
@@ -64,7 +65,7 @@ public class MatchMakerResource {
         }
 
         final String url = GameServerClient.URL + "?token=" + token;
-        return Response.ok(url).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(url).build();
     }
 
     @POST

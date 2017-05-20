@@ -3,7 +3,7 @@ package ru.atom.authmm.server;
 import okhttp3.Response;
 import org.hibernate.Session;
 import org.junit.Test;
-import ru.atom.authmm.server.auth.AuthServer;
+import ru.atom.authmm.server.auth.AuthMmServer;
 import ru.atom.authmm.server.auth.Database;
 import ru.atom.authmm.server.auth.UserDao;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 public class AuthServerTest {
     @Test
     public void testServer() throws Exception {
-        AuthServer.serverRun();
+        AuthMmServer.serverRun();
 
         Session session = Database.session();
         UserDao ud = UserDao.getInstance();
@@ -60,6 +60,6 @@ public class AuthServerTest {
         assertNotNull(ud.getByName(session, "TestUser"));
         ud.deleteByNameTxn(session, "TestUser");
 
-        AuthServer.serverStop();
+        AuthMmServer.serverStop();
     }
 }
