@@ -45,7 +45,7 @@ public class MatchController {
         }
 
         public void broadcast(String msg) {
-            log.info("BROADCASTING (game {}): {}", id, msg);
+            //log.info("BROADCASTING (game {}): {}", id, msg);
             for (Player player : players) ConnectionPool.send(player.session, msg);
         }
     }
@@ -85,7 +85,8 @@ public class MatchController {
             data.players.add(player);
             tokenToPlayer.put(token, player);
         }
-        log.info("Added player {} with token {}, {}:{}.", playerName, token, playerId, gameSessionId);
+        log.info("EXPECT PLAYER {} with token {} to connect to MATCH {}, with INDEX {}.",
+                playerName, token, playerId, gameSessionId);
         return true;
     }
 
@@ -105,12 +106,16 @@ public class MatchController {
         }
         player.session = session;
         Broker.send(session, "Possess(" + player.characterId + ")");
-        log.info("Player {} connected to his game session!", player.name);
+        log.info("CONNECTED PLAYER {}, to MATCH {}, INDEX {}!", player.name, player.match.id, player.id);
         synchronized (player.match) {
             if (player.match.areAllPlayersConnected()) {
                 player.match.isStarted = true;
                 player.match.ticker.start();
-                log.info("All players connected. Game started!");
+                log.info("STARTING MATCH {} with PLAYERS [{}, {}, {}, {}]!", player.match.id,
+                        player.match.players.get(0).name,
+                        player.match.players.get(1).name,
+                        player.match.players.get(2).name,
+                        player.match.players.get(3).name);
             }
         }
     }
@@ -121,12 +126,16 @@ public class MatchController {
                 player.match.players.remove(player);
                 if (player.isConnected()) player.match.ticker.addDieEvent(player.characterId);
                 tokenToPlayer.remove(player.token);
+                log.info("DISCONNECTED PLAYER {} from running MATCH {}! Killing its pawn.",
+                        player.name, player.match.id);
             } else {
                 player.session = null;
+                log.info("DISCONNECTED PLAYER {} from waiting MATCH {}! Waiting for reconnect...",
+                        player.name, player.match.id);
             }
             if (player.match.players.isEmpty() && player.match.ticker.isAlive()) {
                 player.match.ticker.interrupt();
-                log.info("Interrupting ticker for game session {}.", player.match.id);
+                log.info("STOPPING MATCH {}!", player.match.id);
                 synchronized (matches) {
                     matches.remove(player.match.id);
                 }

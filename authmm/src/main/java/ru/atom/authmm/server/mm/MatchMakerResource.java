@@ -42,7 +42,7 @@ public class MatchMakerResource {
     @Consumes("application/x-www-form-urlencoded")
     @Path("/join")
     public Response join(@QueryParam("token") long token) {
-        log.info("Joining user with token {}...", token);
+        //log.info("Joining user with token {}...", token);
         User user = UserDao.getInstance().getByToken(Database.session(), token);
         if (user == null) {
             return Response.status(Response.Status.FORBIDDEN)
@@ -52,12 +52,12 @@ public class MatchMakerResource {
         final long counterValue = numConnections.getAndIncrement();
         final int sessionId = (int)(counterValue / PLAYERS_PER_GAME);
         final int playerId = (int)(counterValue % PLAYERS_PER_GAME);
-        if (counterValue % 4 == 0) {
+        /*if (counterValue % 4 == 0) {
             log.info("Started new game session {}!", sessionId);
         }
         if (counterValue % 4 == 3) {
             log.info("Game session {} is ready!", sessionId - 1);
-        }
+        }*/
 
         if (AuthMmServer.SINGLE_SERVER) {
             MatchController.addPlayerToSession(sessionId, playerId, token, user.name());

@@ -63,7 +63,7 @@ public class GameSession {
     }
 
     public void addGameObject(GameObject gameObject) {
-        log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
+        //log.info("{} {} was added to game session.", gameObject.getClass().getName(), gameObject.id);
         newGameObjects.add(gameObject);
         if (gameObject instanceof Fire) return;
         gameMap[gameObject.getTileY()][gameObject.getTileX()] = gameObject.getCharCode();

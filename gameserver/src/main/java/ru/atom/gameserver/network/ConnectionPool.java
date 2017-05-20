@@ -49,7 +49,7 @@ public class ConnectionPool {
         if (player == null) throw new RuntimeException(
                 "Error! Player must be registered by match maker before connection!");
         if (sessionToPlayerInfo.putIfAbsent(session, player) == null) {
-            log.info("{} joined", player.name);
+            //log.info("{} joined", player.name);
             MatchController.onPlayerConnect(session, playerToken);
         }
     }

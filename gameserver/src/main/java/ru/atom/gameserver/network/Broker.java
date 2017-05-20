@@ -17,12 +17,12 @@ public class Broker {
     }
 
     public static void send(@NotNull Session session, @NotNull String msg) {
-        log.info("SENDING: {}", msg);
+        //log.info("SENDING: {}", msg);
         ConnectionPool.send(session, msg);
     }
 
     public static void broadcast(@NotNull String msg) {
-        log.info("BROADCASTING: {}", msg);
+        //log.info("BROADCASTING: {}", msg);
         ConnectionPool.broadcast(msg);
     }
 
