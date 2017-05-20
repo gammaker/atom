@@ -64,4 +64,8 @@ public class GameSessionTicker extends Thread {
         if (match == null) return;
         match.broadcast("Replica(\n" + replica + ")");
     }
+
+    public long getTickNumber() {
+        return tickNumber;
+    }
 }

@@ -34,6 +34,7 @@ public class MatchController {
         GameSessionTicker ticker;
         ArrayList<Player> players = new ArrayList<>(PLAYERS_PER_GAME);
         int id;
+        boolean isStarted = false;
 
         boolean areAllPlayersConnected() {
             if (players.size() < PLAYERS_PER_GAME) return false;
@@ -105,21 +106,30 @@ public class MatchController {
         player.session = session;
         Broker.send(session, "Possess(" + player.characterId + ")");
         log.info("Player {} connected to his game session!", player.name);
-        if (player.match.areAllPlayersConnected()) {
-            player.match.ticker.start();
-            log.info("All players connected. Game started!");
+        synchronized (player.match) {
+            if (player.match.areAllPlayersConnected()) {
+                player.match.isStarted = true;
+                player.match.ticker.start();
+                log.info("All players connected. Game started!");
+            }
         }
     }
 
     public static void onPlayerDisconnect(Player player) {
-        player.match.players.remove(player);
-        if (player.isConnected()) player.match.ticker.addDieEvent(player.characterId);
-        tokenToPlayer.remove(player.token);
-        if (player.match.players.isEmpty() && player.match.ticker.isAlive()) {
-            player.match.ticker.interrupt();
-            log.info("Interrupting ticker for game session {}.", player.match.id);
-            synchronized (matches) {
-                matches.remove(player.match.id);
+        synchronized (player.match) {
+            if (player.match.isStarted) {
+                player.match.players.remove(player);
+                if (player.isConnected()) player.match.ticker.addDieEvent(player.characterId);
+                tokenToPlayer.remove(player.token);
+            } else {
+                player.session = null;
+            }
+            if (player.match.players.isEmpty() && player.match.ticker.isAlive()) {
+                player.match.ticker.interrupt();
+                log.info("Interrupting ticker for game session {}.", player.match.id);
+                synchronized (matches) {
+                    matches.remove(player.match.id);
+                }
             }
         }
     }
