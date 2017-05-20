@@ -90,6 +90,22 @@ public class MatchController {
         return true;
     }
 
+    public static boolean addPlayerToAnySession(long token, String playerName) {
+        if (tokenToPlayer.containsKey(token)) return false;
+        int maxId = 0;
+        synchronized (matches) {
+            for (MatchData match : matches.values()) {
+                if (match.id > maxId) maxId = match.id;
+                if (match.isStarted) continue;
+                if (match.players.size() >= PLAYERS_PER_GAME) continue;
+                addPlayerToSession(match.id, match.players.size(), token, playerName);
+                return true;
+            }
+            addPlayerToSession(maxId + 1, 0, token, playerName);
+        }
+        return true;
+    }
+
     public static Player getPlayerByToken(long token) {
         return tokenToPlayer.get(token);
     }

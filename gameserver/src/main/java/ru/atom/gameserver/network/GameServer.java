@@ -10,6 +10,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 public class GameServer {
+    public static final boolean SINGLE_SERVER = System.getenv("SINGLE_SERVER") != null;
+
     public static ContextHandler createGameClientContext(String path) {
         ContextHandler context = new ContextHandler();
         context.setContextPath(path);

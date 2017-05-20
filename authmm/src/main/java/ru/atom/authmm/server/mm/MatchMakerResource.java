@@ -60,7 +60,8 @@ public class MatchMakerResource {
         }*/
 
         if (AuthMmServer.SINGLE_SERVER) {
-            MatchController.addPlayerToSession(sessionId, playerId, token, user.name());
+            //Match maker is glitchy so avoid it in single server builds
+            MatchController.addPlayerToAnySession(token, user.name());
         }
         else try {
             // inform the game server that new player will be connected to this session
