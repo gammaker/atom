@@ -10,9 +10,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 public class GameServer {
-    private static ContextHandler createGameClientContext() {
+    public static ContextHandler createGameClientContext(String path) {
         ContextHandler context = new ContextHandler();
-        context.setContextPath("/");
+        context.setContextPath(path);
         ResourceHandler handler = new ResourceHandler();
         handler.setWelcomeFiles(new String[]{"index.html"});
 
@@ -21,9 +21,9 @@ public class GameServer {
         return context;
     }
 
-    private static ContextHandler createGameServerContext() {
+    public static ContextHandler createGameServerContext(String path) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
+        context.setContextPath(path);
         ServletHolder jerseyServlet = context.addServlet(
                 org.glassfish.jersey.servlet.ServletContainer.class, "/*");
         jerseyServlet.setInitOrder(0);
@@ -50,8 +50,8 @@ public class GameServer {
         ContextHandlerCollection contexts = new ContextHandlerCollection();
 
         contexts.setHandlers(new Handler[] {
-                createGameClientContext(),
-                createGameServerContext()
+                createGameClientContext("/"),
+                createGameServerContext("/")
         });
 
         server.setHandler(contexts);

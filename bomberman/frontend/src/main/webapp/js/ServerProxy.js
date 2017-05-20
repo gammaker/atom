@@ -1,6 +1,7 @@
 ServerProxy = Class.extend({
 
-    host: "localhost:8090",
+    host: window.location.host,
+    url: window.location.host + window.location.pathname,
 
     socket: null,
 
@@ -32,7 +33,7 @@ ServerProxy = Class.extend({
 
     initSocket: function() {
         var self = this;
-        this.socket = new WebSocket("ws://" + this.host + "/events");
+        this.socket = new WebSocket("ws://" + this.url + "/events");
 
         this.socket.onopen = function() {
             console.log("Connection established.");

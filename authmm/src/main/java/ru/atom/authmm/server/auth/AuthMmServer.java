@@ -7,20 +7,33 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import ru.atom.gameserver.network.GameServer;
 
 
 public class AuthMmServer {
     private static Server jettyServer;
+    static final boolean SINGLE_SERVER = System.getenv("SINGLE_SERVER") != null;
 
     public static void serverRun() throws Exception {
         Database.setUp();
 
         final ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.setHandlers(new Handler[] {
-                createAuthContext(),
-                createMmContext(),
-                createResourceContext()
-        });
+
+        if (SINGLE_SERVER) {
+            contexts.setHandlers(new Handler[]{
+                    createAuthContext(),
+                    createMmContext(),
+                    createResourceContext(),
+                    GameServer.createGameServerContext("game"),
+                    GameServer.createGameClientContext("game")
+            });
+        } else {
+            contexts.setHandlers(new Handler[]{
+                    createAuthContext(),
+                    createMmContext(),
+                    createResourceContext()
+            });
+        }
 
         final String portEnv = System.getenv("PORT");
         final int port = portEnv == null ? 8080 : Integer.parseInt(portEnv);
