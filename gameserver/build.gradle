@@ -16,6 +16,10 @@ jar {
     manifest { attributes 'Main-Class': 'ru.atom.gameserver.network.GameServer' }
 }
 
+task stage {
+    dependsOn jar
+}
+
 sourceSets {
     main {
         java {

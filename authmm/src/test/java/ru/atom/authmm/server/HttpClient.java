@@ -17,8 +17,19 @@ public class HttpClient {
     private static final OkHttpClient client = new OkHttpClient();
     private static final String PROTOCOL = "http://";
     private static final String HOST = "localhost";
-    private static final String AUTH_PORT = ":8080";
-    private static final String MM_PORT = ":8081";
+    private static final String AUTH_PORT;
+    private static final String MM_PORT;
+
+    static {
+        final String portEnv = System.getenv("PORT");
+        if (portEnv == null) {
+            AUTH_PORT = ":8080";
+            MM_PORT = ":8080";
+        } else {
+            AUTH_PORT = ":" + portEnv;
+            MM_PORT = ":" + portEnv;
+        }
+    }
 
     public static Response login(String name, String password) throws IOException {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");

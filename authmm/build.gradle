@@ -17,6 +17,9 @@ jar {
     manifest { attributes 'Main-Class': 'ru.atom.authmm.server.auth.AuthMmServer' }
 }
 
+task stage {
+    dependsOn jar
+}
 
 sourceSets {
     main {
