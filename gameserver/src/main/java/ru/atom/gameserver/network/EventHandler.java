@@ -22,6 +22,9 @@ public class EventHandler extends WebSocketAdapter {
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         log.info("Received TEXT message: {}.", message);
+
+        if (message.equals("HB")) return;
+
         if (token == null && message.startsWith("Token ")) {
             try {
                 token = Long.parseLong(message.substring(6));

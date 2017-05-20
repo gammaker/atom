@@ -1,5 +1,7 @@
 package ru.atom.authmm.server.auth;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -12,21 +14,27 @@ import ru.atom.gameserver.network.GameServer;
 
 public class AuthMmServer {
     private static Server jettyServer;
-    static final boolean SINGLE_SERVER = System.getenv("SINGLE_SERVER") != null;
+    public static final boolean SINGLE_SERVER = System.getenv("SINGLE_SERVER") != null;
+
+    private static final Logger log = LogManager.getLogger(AuthMmServer.class);
 
     public static void serverRun() throws Exception {
         Database.setUp();
 
         final ContextHandlerCollection contexts = new ContextHandlerCollection();
 
+        final String portEnv = System.getenv("PORT");
+        final int port = portEnv == null ? 8080 : Integer.parseInt(portEnv);
+
         if (SINGLE_SERVER) {
             contexts.setHandlers(new Handler[]{
                     createAuthContext(),
                     createMmContext(),
                     createResourceContext(),
-                    GameServer.createGameServerContext("game"),
-                    GameServer.createGameClientContext("game")
+                    GameServer.createGameServerContext("/"),
+                    GameServer.createGameClientContext("/game")
             });
+            log.info("Creating single server with all services on port {}.", port);
         } else {
             contexts.setHandlers(new Handler[]{
                     createAuthContext(),
@@ -34,9 +42,6 @@ public class AuthMmServer {
                     createResourceContext()
             });
         }
-
-        final String portEnv = System.getenv("PORT");
-        final int port = portEnv == null ? 8080 : Integer.parseInt(portEnv);
 
         jettyServer = new Server(port);
         jettyServer.setHandler(contexts);

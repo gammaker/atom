@@ -37,7 +37,8 @@
         };
 
         $.ajax(settings).done(function(response) {
-            window.location = response;
+            if (response.lastIndexOf("http", 0) === 0) window.location = response;
+            else window.location = window.location.protocol + "//" + window.location.host + response;
         }).fail(function (jqXHR, textStatus) {
             alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
             console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);

@@ -1,7 +1,7 @@
 ServerProxy = Class.extend({
 
     host: window.location.host,
-    url: window.location.host + window.location.pathname,
+    url: window.location.host,
 
     socket: null,
 
@@ -38,9 +38,13 @@ ServerProxy = Class.extend({
         this.socket.onopen = function() {
             console.log("Connection established.");
             self.socket.send("Token " + Utils.getParameterByName("token"));
+            self.socket.heartbeat = setInterval(function() {
+                self.socket.send("HB");
+            }, 10000);
         };
 
         this.socket.onclose = function(event) {
+            clearInterval(self.socket.heartbeat);
             if (event.wasClean) {
                 console.log('closed');
             } else {

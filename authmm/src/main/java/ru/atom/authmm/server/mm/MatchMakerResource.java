@@ -7,9 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import ru.atom.authmm.server.auth.AuthMmServer;
 import ru.atom.authmm.server.auth.Database;
 import ru.atom.authmm.server.auth.User;
 import ru.atom.authmm.server.auth.UserDao;
+import ru.atom.gameserver.network.MatchController;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -56,7 +58,11 @@ public class MatchMakerResource {
         if (counterValue % 4 == 3) {
             log.info("Game session {} is ready!", sessionId - 1);
         }
-        try {
+
+        if (AuthMmServer.SINGLE_SERVER) {
+            MatchController.addPlayerToSession(sessionId, playerId, token, user.name());
+        }
+        else try {
             // inform the game server that new player will be connected to this session
             GameServerClient.addPlayer(sessionId, playerId, token, user.name());
         } catch (IOException e) {
@@ -64,8 +70,9 @@ public class MatchMakerResource {
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
         }
 
-        final String url = GameServerClient.URL + "?token=" + token;
-        return Response.ok(url).build();
+        String urlEnding = "?token=" + token;
+        if (System.getenv("SINGLE_SERVER") != null) urlEnding = "/game" + urlEnding;
+        return Response.ok(urlEnding).build();
     }
 
     @POST

@@ -21,6 +21,7 @@ public class MatchControllerResource {
                               @FormParam("player") int playerId,
                               @FormParam("token") long token,
                               @FormParam("name") @NotNull String playerName) {
+        log.info("Adding player {} with token {} to game session {}.", playerName, token, gameSessionId);
         final boolean success = MatchController.addPlayerToSession(gameSessionId, playerId, token, playerName);
         if (!success) return Response.status(Response.Status.BAD_REQUEST).build();
         return Response.ok().build();
