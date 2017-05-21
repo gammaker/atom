@@ -8,8 +8,8 @@ import ru.atom.gameserver.geometry.Point;
  */
 public class Character extends GameObject implements Movable, Destructible {
 
-    private static final int HEIGHT = Level.TILE_HEIGHT - 8;
-    private static final int WIDTH = Level.TILE_WIDTH - 8;
+    private static final int HEIGHT = Level.TILE_HEIGHT - 12;
+    private static final int WIDTH = Level.TILE_WIDTH - 12;
 
     private Direction direction = Direction.IDLE;
     private long timeForNextBomb = 0;
@@ -90,8 +90,8 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     private boolean collisionFlag(int dx, int dy) {
-        final int tileX = (pos.x + dx + 4500) / (1000 * Level.TILE_WIDTH);
-        final int tileY = (pos.y + dy + 4500) / (1000 * Level.TILE_HEIGHT);
+        final int tileX = (pos.x + dx + 6500) / (1000 * Level.TILE_WIDTH);
+        final int tileY = (pos.y + dy + 6500) / (1000 * Level.TILE_HEIGHT);
         final Bar barCharacter = createCharacterBar(dx, dy);
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
@@ -141,11 +141,11 @@ public class Character extends GameObject implements Movable, Destructible {
     }
 
     public Bar createCharacterBar(int dx, int dy) {
-        return Bar.fromPosAndSize((pos.x + dx + 500) / 1000 + 4, (pos.y + dy + 500) / 1000 + 4, WIDTH, HEIGHT);
+        return Bar.fromPosAndSize((pos.x + dx + 500) / 1000 + 6, (pos.y + dy + 500) / 1000 + 6, WIDTH, HEIGHT);
     }
 
     public Bar createCharacterBar() {
-        return Bar.fromPosAndSize(getX() + 4, getY() + 4, WIDTH , HEIGHT);
+        return Bar.fromPosAndSize(getX() + 6, getY() + 6, WIDTH , HEIGHT);
     }
 
     @Override
