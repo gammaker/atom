@@ -9,6 +9,7 @@ import ru.atom.gameserver.model.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MatchController manages game sessions on this game server.
@@ -37,11 +38,13 @@ public class MatchController {
         boolean isStarted = false;
 
         boolean areAllPlayersConnected() {
-            if (players.size() < PLAYERS_PER_GAME) return false;
-            for (Player player : players) {
-                if (!player.isConnected()) return false;
-            }
-            return true;
+            return numPlayersConnected() == PLAYERS_PER_GAME;
+        }
+
+        int numPlayersConnected() {
+            int result = 0;
+            for (Player player : players) if (player.isConnected()) result++;
+            return result;
         }
 
         public void broadcast(String msg) {
@@ -51,7 +54,7 @@ public class MatchController {
     }
 
     private static final HashMap<Integer, MatchData> matches = new HashMap<>();
-    private static final HashMap<Long, Player> tokenToPlayer = new HashMap<>();
+    private static final ConcurrentHashMap<Long, Player> tokenToPlayer = new ConcurrentHashMap<>();
 
     public static boolean addPlayerToSession(int gameSessionId, int playerId, long token, String playerName) {
         if (tokenToPlayer.containsKey(token)) return false;
@@ -92,7 +95,7 @@ public class MatchController {
 
     public static boolean addPlayerToAnySession(long token, String playerName) {
         if (tokenToPlayer.containsKey(token)) return false;
-        int maxId = 0;
+        int maxId = -1;
         synchronized (matches) {
             for (MatchData match : matches.values()) {
                 if (match.id > maxId) maxId = match.id;
@@ -120,40 +123,44 @@ public class MatchController {
             log.warn("Player {} is already connected!", player.name);
             return;
         }
+        final MatchData match = player.match;
         player.session = session;
         Broker.send(session, "Possess(" + player.characterId + ")");
-        log.info("CONNECTED PLAYER {}, to MATCH {}, INDEX {}!", player.name, player.match.id, player.id);
-        synchronized (player.match) {
-            if (player.match.areAllPlayersConnected()) {
-                player.match.isStarted = true;
-                player.match.ticker.start();
-                log.info("STARTING MATCH {} with PLAYERS [{}, {}, {}, {}]!", player.match.id,
-                        player.match.players.get(0).name,
-                        player.match.players.get(1).name,
-                        player.match.players.get(2).name,
-                        player.match.players.get(3).name);
+        log.info("CONNECTED PLAYER {}, to MATCH {}, INDEX {}! {}/{} connected.",
+                player.name, match.id, player.id, match.numPlayersConnected(), PLAYERS_PER_GAME);
+
+        synchronized (matches) {
+            if (match.areAllPlayersConnected()) {
+                match.isStarted = true;
+                match.ticker.start();
+                log.info("STARTING MATCH {} with PLAYERS [{}, {}, {}, {}]!", match.id,
+                        match.players.get(0).name,
+                        match.players.get(1).name,
+                        match.players.get(2).name,
+                        match.players.get(3).name);
             }
         }
     }
 
     public static void onPlayerDisconnect(Player player) {
-        synchronized (player.match) {
-            if (player.match.isStarted) {
-                player.match.players.remove(player);
-                if (player.isConnected()) player.match.ticker.addDieEvent(player.characterId);
-                tokenToPlayer.remove(player.token);
+        synchronized (matches) {
+            final MatchData match = player.match;
+            if (match.isStarted) {
+                if (player.isConnected()) match.ticker.addDieEvent(player.characterId);
                 log.info("DISCONNECTED PLAYER {} from running MATCH {}! Killing its pawn.",
-                        player.name, player.match.id);
+                        player.name, match.id);
             } else {
                 player.session = null;
-                log.info("DISCONNECTED PLAYER {} from waiting MATCH {}! Waiting for reconnect...",
-                        player.name, player.match.id);
+                log.info("DISCONNECTED PLAYER {} from waiting MATCH {}! {}/{} connected.",
+                        player.name, match.id, match.numPlayersConnected(), PLAYERS_PER_GAME);
             }
-            if (player.match.players.isEmpty() && player.match.ticker.isAlive()) {
-                player.match.ticker.interrupt();
-                log.info("STOPPING MATCH {}!", player.match.id);
+            match.players.remove(player);
+            tokenToPlayer.remove(player.token);
+            if (match.players.isEmpty() && match.ticker.isAlive()) {
+                match.ticker.interrupt();
+                log.info("STOPPING MATCH {}!", match.id);
                 synchronized (matches) {
-                    matches.remove(player.match.id);
+                    matches.remove(match.id);
                 }
             }
         }

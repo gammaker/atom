@@ -48,6 +48,11 @@ public class ConnectionPool {
         MatchController.Player player = MatchController.getPlayerByToken(playerToken);
         if (player == null) throw new RuntimeException(
                 "Error! Player must be registered by match maker before connection!");
+        if (player.isConnected()) {
+            log.warn("Player {} is already connected!", player.name);
+            session.close();
+            return;
+        }
         if (sessionToPlayerInfo.putIfAbsent(session, player) == null) {
             //log.info("{} joined", player.name);
             MatchController.onPlayerConnect(session, playerToken);
